@@ -1,9 +1,6 @@
 package llm
 
-import (
-	"context"
-	"fmt"
-)
+import "context"
 
 // Provider is an interface all LLM providers must implement.
 type Provider interface {
@@ -38,8 +35,5 @@ func Call(ctx context.Context, provider Provider, prompt string, options ...Cont
 		return cs[0].Content, nil
 	}
 
-	return "", ErrEmptyResponseFromModel
+	return "", ErrEmptyResponseFromProvider
 }
-
-// ErrEmptyResponseFromModel is returned when there was an empty response from the model.
-var ErrEmptyResponseFromModel = fmt.Errorf("empty response from model")
