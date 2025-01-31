@@ -35,9 +35,7 @@ func (m *Buffer) MemoryVariables(context.Context) []string {
 // are returned in a map with the key specified in the MemoryKey field. This key defaults to
 // "history". If ReturnMessages is set to true the output is a slice of llms.ChatMessage. Otherwise,
 // the output is a buffer string of the chat messages.
-func (m *Buffer) LoadMemoryVariables(
-	ctx context.Context, _ map[string]any,
-) (map[string]any, error) {
+func (m *Buffer) LoadMemoryVariables(ctx context.Context, _ map[string]any) (map[string]any, error) {
 	messages, err := m.ChatHistory.Messages(ctx)
 	if err != nil {
 		return nil, err
@@ -66,17 +64,13 @@ func (m *Buffer) LoadMemoryVariables(
 // input key must be a key in the input values and the output key must be a key in the output
 // values. The values in the input and output values used to save a user and AI message must
 // be strings.
-func (m *Buffer) SaveContext(
-	ctx context.Context,
-	inputValues map[string]any,
-	outputValues map[string]any,
-) error {
+func (m *Buffer) SaveContext(ctx context.Context, inputValues map[string]any, outputValues map[string]any) error {
 	userInputValue, err := GetInputValue(inputValues, m.InputKey)
 	if err != nil {
 		return err
 	}
-	err = m.ChatHistory.AddUserMessage(ctx, userInputValue)
-	if err != nil {
+
+	if err := m.ChatHistory.AddUserMessage(ctx, userInputValue); err != nil {
 		return err
 	}
 
@@ -84,12 +78,8 @@ func (m *Buffer) SaveContext(
 	if err != nil {
 		return err
 	}
-	err = m.ChatHistory.AddAIMessage(ctx, aiOutputValue)
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return m.ChatHistory.AddAIMessage(ctx, aiOutputValue)
 }
 
 // Clear sets the chat messages to a new and empty chat message history.
@@ -132,9 +122,7 @@ func GetInputValue(inputValues map[string]any, inputKey string) (string, error) 
 	return "", fmt.Errorf("%w: 0 keys", llm.ErrInvalidInputValues)
 }
 
-func getInputValueReturnToString(
-	inputValue interface{},
-) (string, error) {
+func getInputValueReturnToString(inputValue any) (string, error) {
 	switch value := inputValue.(type) {
 	case string:
 		return value, nil
