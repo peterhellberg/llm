@@ -12,6 +12,10 @@ type Hooks interface {
 	ToolHooks
 }
 
+type AgentHooker interface {
+	AgentHooks() AgentHooks
+}
+
 type ChainHooker interface {
 	ChainHooks() ChainHooks
 }
@@ -19,6 +23,7 @@ type ChainHooker interface {
 type AgentHooks interface {
 	AgentAction(ctx context.Context, action AgentAction)
 	AgentFinish(ctx context.Context, finish AgentFinish)
+	StreamingFunc(ctx context.Context, chunk []byte)
 }
 
 type ChainHooks interface {
