@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/peterhellberg/llm"
-	"github.com/peterhellberg/llm/chains/llmchain"
+	"github.com/peterhellberg/llm/chains"
 )
 
 const (
@@ -45,7 +45,7 @@ func NewOneShotAgent(provider llm.Provider, tools []llm.AgentTool, opts ...Optio
 	}
 
 	return &OneShotZeroAgent{
-		Chain: llmchain.New(
+		Chain: chains.New(
 			provider,
 			options.getMrklPrompt(tools),
 			llm.ChainWithHooks(options.hooks),

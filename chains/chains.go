@@ -1,4 +1,4 @@
-package llmchain
+package chains
 
 import (
 	"context"
@@ -26,7 +26,7 @@ type Chain struct {
 	OutputKey string
 }
 
-// New chain with an LLM and a prompt.
+// New chain with a LLM provider and a prompt.
 func New(provider llm.Provider, prompter llm.Prompter, opts ...llm.ChainOption) *Chain {
 	opt := &llm.ChainOptions{}
 

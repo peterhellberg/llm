@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/peterhellberg/llm"
-	"github.com/peterhellberg/llm/chains/llmchain"
+	"github.com/peterhellberg/llm/chains"
 	"github.com/peterhellberg/llm/hooks/write"
 	"github.com/peterhellberg/llm/prompts"
 	"github.com/peterhellberg/llm/providers/ollama"
@@ -47,7 +47,7 @@ func run(ctx context.Context, env llm.Env, args []string, w io.Writer) error {
 		[]string{"product"},
 	)
 
-	chain := llmchain.New(provider, prompt, llm.ChainWithHooks(hooks))
+	chain := chains.New(provider, prompt, chains.WithHooks(hooks))
 
 	out, err := llm.ChainRun(ctx, chain, "socks")
 	if err != nil {
@@ -61,7 +61,7 @@ func run(ctx context.Context, env llm.Env, args []string, w io.Writer) error {
 		[]string{"inputLanguage", "outputLanguage", "text"},
 	)
 
-	chain = llmchain.New(provider, translatePrompt, llm.ChainWithHooks(hooks))
+	chain = chains.New(provider, translatePrompt, chains.WithHooks(hooks))
 
 	fmt.Fprintf(w, "\n-------\n\n")
 

@@ -1,4 +1,4 @@
-package llmchain
+package chains
 
 import (
 	"github.com/peterhellberg/llm"

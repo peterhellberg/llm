@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/peterhellberg/llm"
-	"github.com/peterhellberg/llm/chains/llmchain"
+	"github.com/peterhellberg/llm/chains"
 	"github.com/peterhellberg/llm/prompts"
 )
 
@@ -45,7 +45,7 @@ func NewConversationalAgent(provider llm.Provider, tools []llm.AgentTool, opts .
 	}
 
 	return &ConversationalAgent{
-		Chain: llmchain.New(
+		Chain: chains.New(
 			provider,
 			options.getConversationalPrompt(tools),
 			llm.ChainWithHooks(options.hooks),
