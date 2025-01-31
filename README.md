@@ -14,4 +14,4 @@ See [./examples](./examples) for example usage.
 ## License (MIT)
 
 Since **LangChainGo** is [licensed under MIT](https://github.com/tmc/langchaingo/blob/main/LICENSE)
-it almost goes without saying that this project should be so as well :clipboard:
+it goes without saying that this project should be so as well :clipboard:
