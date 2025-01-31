@@ -51,7 +51,7 @@ type ContentOptions struct {
 
 	// Metadata is a map of metadata to include in the request.
 	// The meaning of this field is specific to the backend in use.
-	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	Metadata map[string]any `json:"metadata,omitempty"`
 }
 
 // Tool is a tool that can be used by the model.
@@ -234,7 +234,7 @@ func WithJSONMode() ContentOption {
 
 // WithMetadata will add an option to set metadata to include in the request.
 // The meaning of this field is specific to the backend in use.
-func WithMetadata(metadata map[string]interface{}) ContentOption {
+func WithMetadata(metadata map[string]any) ContentOption {
 	return func(o *ContentOptions) {
 		o.Metadata = metadata
 	}
