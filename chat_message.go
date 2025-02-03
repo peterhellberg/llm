@@ -1,10 +1,56 @@
 package llm
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"strings"
 )
+
+// Statically assert that the types implement the ChatMessage interface.
+var (
+	_ ChatMessage = AIChatMessage{}
+	_ ChatMessage = HumanChatMessage{}
+	_ ChatMessage = SystemChatMessage{}
+	_ ChatMessage = GenericChatMessage{}
+	_ ChatMessage = ToolChatMessage{}
+)
+
+// ChatMessage represents a message in a chat.
+type ChatMessage interface {
+	// Type gets the type of the message.
+	Type() ChatMessageType
+	// MessageContent gets the content of the message.
+	MessageContent() string
+}
+
+// ChatMessageHistory is the interface for chat history in memory/store.
+type ChatMessageHistory interface {
+	// AddMessage adds a message to the store.
+	AddMessage(ctx context.Context, message ChatMessage) error
+
+	// AddUserMessage is a convenience method for adding a human message string
+	// to the store.
+	AddUserMessage(ctx context.Context, message string) error
+
+	// AddAIMessage is a convenience method for adding an AI message string to
+	// the store.
+	AddAIMessage(ctx context.Context, message string) error
+
+	// Clear removes all messages from the store.
+	Clear(ctx context.Context) error
+
+	// Messages retrieves all messages from the store
+	Messages(ctx context.Context) ([]ChatMessage, error)
+
+	// SetMessages replaces existing messages in the store
+	SetMessages(ctx context.Context, messages []ChatMessage) error
+}
+
+// Named is an interface for objects that have a message name.
+type Named interface {
+	MessageName() string
+}
 
 // ChatMessageType is the type of chat message.
 type ChatMessageType string
@@ -22,28 +68,6 @@ const (
 	ChatMessageTypeFunction ChatMessageType = "function"
 	// ChatMessageTypeTool is a message sent by a tool.
 	ChatMessageTypeTool ChatMessageType = "tool"
-)
-
-// ChatMessage represents a message in a chat.
-type ChatMessage interface {
-	// Type gets the type of the message.
-	Type() ChatMessageType
-	// MessageContent gets the content of the message.
-	MessageContent() string
-}
-
-// Named is an interface for objects that have a message name.
-type Named interface {
-	MessageName() string
-}
-
-// Statically assert that the types implement the interface.
-var (
-	_ ChatMessage = AIChatMessage{}
-	_ ChatMessage = HumanChatMessage{}
-	_ ChatMessage = SystemChatMessage{}
-	_ ChatMessage = GenericChatMessage{}
-	_ ChatMessage = ToolChatMessage{}
 )
 
 // AIChatMessage is a message sent by an AI.
@@ -153,36 +177,4 @@ func getMessageRole(m ChatMessage, humanPrefix, aiPrefix string) (string, error)
 	}
 
 	return role, nil
-}
-
-type ChatMessageModelData struct {
-	Content string `bson:"content" json:"content"`
-	Type    string `bson:"type"    json:"type"`
-}
-
-type ChatMessageModel struct {
-	Type string               `bson:"type" json:"type"`
-	Data ChatMessageModelData `bson:"data" json:"data"`
-}
-
-func (c ChatMessageModel) ToChatMessage() ChatMessage {
-	switch c.Type {
-	case string(ChatMessageTypeAI):
-		return AIChatMessage{Content: c.Data.Content}
-	case string(ChatMessageTypeHuman):
-		return HumanChatMessage{Content: c.Data.Content}
-	default:
-		return nil
-	}
-}
-
-// ConvertChatMessageToModel Convert a ChatMessage to a ChatMessageModel.
-func ConvertChatMessageToModel(m ChatMessage) ChatMessageModel {
-	return ChatMessageModel{
-		Type: string(m.Type()),
-		Data: ChatMessageModelData{
-			Type:    string(m.Type()),
-			Content: m.MessageContent(),
-		},
-	}
 }
