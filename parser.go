@@ -9,8 +9,6 @@ import (
 type Parser[T any] interface {
 	// Parse parses the output of an LLM call.
 	Parse(text string) (T, error)
-	// ParseWithPrompt parses the output of an LLM call with the prompt used.
-	ParseWithPrompt(text string, prompt Prompt) (T, error)
 	// FormatInstructions returns a string describing the format of the output.
 	FormatInstructions() string
 	// Type returns the string type key uniquely identifying this class of parser

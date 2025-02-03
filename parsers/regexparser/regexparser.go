@@ -9,6 +9,12 @@ import (
 
 var _ llm.Parser[any] = Parser{}
 
+const (
+	parserType               = "regex_parser"
+	parserFormatInstructions = "Your output should be a map of strings. e.g.:\n" +
+		"map[string]string{\"key1\": \"value1\", \"key2\": \"value2\"}"
+)
+
 // New returns a regexp Parser.
 func New(str string) Parser {
 	expression := regexp.MustCompile(str)
@@ -26,26 +32,18 @@ type Parser struct {
 	outputKeys []string
 }
 
-// FormatInstructions returns instructions on the expected output format.
-func (p Parser) FormatInstructions() string {
-	instructions := "Your output should be a map of strings. e.g.:\n"
-	instructions += "map[string]string{\"key1\": \"value1\", \"key2\": \"value2\"}"
-
-	return instructions
-}
-
 // Type returns the type of the parser.
 func (p Parser) Type() string {
-	return "regex_parser"
+	return parserType
+}
+
+// FormatInstructions returns instructions on the expected output format.
+func (p Parser) FormatInstructions() string {
+	return parserFormatInstructions
 }
 
 // Parse parses the output of an LLM into a map of strings.
 func (p Parser) Parse(text string) (any, error) {
-	return p.parse(text)
-}
-
-// ParseWithPrompt does the same as Parse.
-func (p Parser) ParseWithPrompt(text string, _ llm.Prompt) (any, error) {
 	return p.parse(text)
 }
 

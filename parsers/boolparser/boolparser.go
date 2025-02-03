@@ -10,6 +10,11 @@ import (
 
 var _ llm.Parser[any] = Parser{}
 
+const (
+	parserType               = "bool_parser"
+	parserFormatInstructions = "Your output should be a boolean. e.g.:\n `true` or `false`"
+)
+
 // Parser is an output parser used to parse the output of an LLM as a boolean.
 type Parser struct {
 	trueStrings  []string
@@ -24,9 +29,19 @@ func New() Parser {
 	}
 }
 
+// Type returns the type of the parser.
+func (p Parser) Type() string {
+	return parserType
+}
+
 // FormatInstructions returns instructions on the expected output format.
 func (p Parser) FormatInstructions() string {
-	return "Your output should be a boolean. e.g.:\n `true` or `false`"
+	return parserFormatInstructions
+}
+
+// Parse parses the output of an LLM into a map of strings.
+func (p Parser) Parse(text string) (any, error) {
+	return p.parse(text)
 }
 
 func (p Parser) parse(text string) (bool, error) {
@@ -53,19 +68,4 @@ func normalize(text string) string {
 	text = strings.ToUpper(text)
 
 	return text
-}
-
-// Parse parses the output of an LLM into a map of strings.
-func (p Parser) Parse(text string) (any, error) {
-	return p.parse(text)
-}
-
-// ParseWithPrompt does the same as Parse.
-func (p Parser) ParseWithPrompt(text string, _ llm.Prompt) (any, error) {
-	return p.parse(text)
-}
-
-// Type returns the type of the parser.
-func (p Parser) Type() string {
-	return "boolean_parser"
 }
