@@ -42,44 +42,49 @@ func run(ctx context.Context, env llm.Env, args []string, w io.Writer) error {
 		return err
 	}
 
-	prompt := prompts.NewTemplate(
-		"What is a good name for a company that makes {{.product}}?",
-		[]string{"product"},
-	)
+	{ // First example
+		prompt := prompts.NewTemplate(
+			"What is a good name for a company that makes {{.product}}?",
+			[]string{"product"},
+		)
 
-	chain := chains.New(provider, prompt, llm.ChainWithHooks(hooks))
+		chain := chains.New(provider, prompt, llm.ChainWithHooks(hooks))
 
-	out, err := chains.Run(ctx, chain, "socks")
-	if err != nil {
-		return err
+		out, err := chains.Run(ctx, chain, "socks")
+		if err != nil {
+			return err
+		}
+
+		fmt.Println(out)
 	}
 
-	fmt.Println(out)
+	{ // Second example
+		translatePrompt := prompts.NewTemplate(
+			"Translate the following text from {{.inputLanguage}} to {{.outputLanguage}}. {{.text}}",
+			[]string{"inputLanguage", "outputLanguage", "text"},
+		)
 
-	translatePrompt := prompts.NewTemplate(
-		"Translate the following text from {{.inputLanguage}} to {{.outputLanguage}}. {{.text}}",
-		[]string{"inputLanguage", "outputLanguage", "text"},
-	)
+		chain := chains.New(provider, translatePrompt, llm.ChainWithHooks(hooks))
 
-	chain = chains.New(provider, translatePrompt, llm.ChainWithHooks(hooks))
+		fmt.Fprintf(w, "\n-------\n\n")
 
-	fmt.Fprintf(w, "\n-------\n\n")
+		// Otherwise the call function must be used.
+		outputValues, err := chains.Call(ctx, chain, map[string]any{
+			"inputLanguage":  "English",
+			"outputLanguage": "German",
+			"text":           "I love programming.",
+		})
+		if err != nil {
+			return err
+		}
 
-	// Otherwise the call function must be used.
-	outputValues, err := chains.Call(ctx, chain, map[string]any{
-		"inputLanguage":  "English",
-		"outputLanguage": "German",
-		"text":           "I love programming.",
-	})
-	if err != nil {
-		return err
+		out, ok := outputValues[chain.OutputKey].(string)
+		if !ok {
+			return fmt.Errorf("invalid chain return")
+		}
+
+		fmt.Println(out)
 	}
-
-	out, ok := outputValues[chain.OutputKey].(string)
-	if !ok {
-		return fmt.Errorf("invalid chain return")
-	}
-	fmt.Println(out)
 
 	return nil
 }
