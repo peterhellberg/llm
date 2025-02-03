@@ -62,6 +62,9 @@ func TestVectorStoreRetriever(t *testing.T) {
 					RetrieverEndFunc:   retrieverEnd,
 				},
 			),
+			llm.VectorStoreRetrieverWithOptions(
+				llm.VectorStoreWithNameSpace("testns"),
+			),
 		).RelevantDocuments(ctx, query)
 	})
 }

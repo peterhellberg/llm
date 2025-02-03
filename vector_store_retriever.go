@@ -53,7 +53,7 @@ func VectorStoreRetrieverWithHooks(hooks RetrieverHooks) VectorStoreRetrieverOpt
 	}
 }
 
-func VectorStoreRetrieverWithVectorStoreOptions(options ...VectorStoreOption) VectorStoreRetrieverOption {
+func VectorStoreRetrieverWithOptions(options ...VectorStoreOption) VectorStoreRetrieverOption {
 	return func(o *VectorStoreRetriever) {
 		o.options = options
 	}
