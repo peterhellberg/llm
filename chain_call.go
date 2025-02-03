@@ -1,14 +1,12 @@
-package chains
+package llm
 
 import (
 	"context"
 	"fmt"
-
-	"github.com/peterhellberg/llm"
 )
 
 // Call is the standard function used for executing chains.
-func Call(ctx context.Context, c llm.Chain, inputValues map[string]any, options ...llm.ChainOption) (map[string]any, error) {
+func ChainCall(ctx context.Context, c Chain, inputValues map[string]any, options ...ChainOption) (map[string]any, error) {
 	fullValues := make(map[string]any, 0)
 
 	for key, value := range inputValues {
@@ -50,7 +48,7 @@ func Call(ctx context.Context, c llm.Chain, inputValues map[string]any, options 
 	return outputValues, nil
 }
 
-func call(ctx context.Context, c llm.Chain, fullValues map[string]any, options ...llm.ChainOption) (map[string]any, error) {
+func call(ctx context.Context, c Chain, fullValues map[string]any, options ...ChainOption) (map[string]any, error) {
 	if err := validateInputs(c, fullValues); err != nil {
 		return nil, err
 	}
@@ -67,28 +65,28 @@ func call(ctx context.Context, c llm.Chain, fullValues map[string]any, options .
 	return outputValues, nil
 }
 
-func validateInputs(c llm.Chain, inputValues map[string]any) error {
+func validateInputs(c Chain, inputValues map[string]any) error {
 	for _, k := range c.InputKeys() {
 		if _, ok := inputValues[k]; !ok {
-			return fmt.Errorf("%w: %w: %v", llm.ErrInvalidInputValues, llm.ErrMissingInputValues, k)
+			return fmt.Errorf("%w: %w: %v", ErrInvalidInputValues, ErrMissingInputValues, k)
 		}
 	}
 
 	return nil
 }
 
-func validateOutputs(c llm.Chain, outputValues map[string]any) error {
+func validateOutputs(c Chain, outputValues map[string]any) error {
 	for _, k := range c.OutputKeys() {
 		if _, ok := outputValues[k]; !ok {
-			return fmt.Errorf("%w: %v", llm.ErrInvalidOutputValues, k)
+			return fmt.Errorf("%w: %v", ErrInvalidOutputValues, k)
 		}
 	}
 
 	return nil
 }
 
-func getChainHooks(c llm.Chain) llm.ChainHooks {
-	if hh, ok := c.(llm.ChainHooker); ok {
+func getChainHooks(c Chain) ChainHooks {
+	if hh, ok := c.(ChainHooker); ok {
 		return hh.ChainHooks()
 	}
 

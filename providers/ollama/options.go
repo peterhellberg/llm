@@ -15,7 +15,8 @@ const (
 	defaultOllamaPort = "11434"
 )
 
-type options struct {
+type Options struct {
+	hooks               llm.ProviderHooks
 	ollamaServerURL     *url.URL
 	httpClient          *http.Client
 	model               string
@@ -24,21 +25,20 @@ type options struct {
 	system              string
 	format              string
 	keepAlive           string
-	Hooks               llm.ProviderHooks
 }
 
-type Option func(*options) error
+type Option func(*Options) error
 
 func WithHooks(hooks llm.Hooks) Option {
-	return func(opts *options) error {
-		opts.Hooks = hooks
+	return func(opts *Options) error {
+		opts.hooks = hooks
 
 		return nil
 	}
 }
 
 func WithHost(host string) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		fn := func(hostport string) (string, error) {
 			host, port, _ := strings.Cut(hostport, ":")
 
@@ -64,7 +64,7 @@ func WithHost(host string) Option {
 
 // WithModel Set the model to use.
 func WithModel(model string) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.model = model
 
 		return nil
@@ -73,7 +73,7 @@ func WithModel(model string) Option {
 
 // WithFormat Sets the Ollama output format (currently Ollama only supports "json").
 func WithFormat(format string) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.format = format
 
 		return nil
@@ -88,7 +88,7 @@ func WithFormat(format string) Option {
 //	If set to 0, the model will be unloaded immediately once finished
 //	If not set, the model will stay loaded for 5 minutes by default
 func WithKeepAlive(keepAlive string) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.keepAlive = keepAlive
 
 		return nil
@@ -100,7 +100,7 @@ func WithKeepAlive(keepAlive string) Option {
 // .System in its model template OR if WithCustomTemplate
 // is set using {{.System}}.
 func WithSystemPrompt(p string) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.system = p
 
 		return nil
@@ -109,7 +109,7 @@ func WithSystemPrompt(p string) Option {
 
 // WithCustomTemplate To override the templating done on Ollama model side.
 func WithCustomTemplate(template string) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.customModelTemplate = template
 
 		return nil
@@ -118,7 +118,7 @@ func WithCustomTemplate(template string) Option {
 
 // WithServerURL Set the URL of the ollama instance to use.
 func WithServerURL(rawURL string) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		var err error
 		opts.ollamaServerURL, err = url.Parse(rawURL)
 		if err != nil {
@@ -131,7 +131,7 @@ func WithServerURL(rawURL string) Option {
 
 // WithHTTPClient Set custom http client.
 func WithHTTPClient(client *http.Client) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.httpClient = client
 
 		return nil
@@ -140,7 +140,7 @@ func WithHTTPClient(client *http.Client) Option {
 
 // WithRunnerUseNUMA Use NUMA optimization on certain systems.
 func WithRunnerUseNUMA(numa bool) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.ollamaOptions.UseNUMA = numa
 
 		return nil
@@ -149,7 +149,7 @@ func WithRunnerUseNUMA(numa bool) Option {
 
 // WithRunnerNumCtx Sets the size of the context window used to generate the next token (Default: 2048).
 func WithRunnerNumCtx(num int) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.ollamaOptions.NumCtx = num
 
 		return nil
@@ -159,7 +159,7 @@ func WithRunnerNumCtx(num int) Option {
 // WithRunnerNumKeep Specify the number of tokens from the initial prompt to retain when the model resets
 // its internal context.
 func WithRunnerNumKeep(num int) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.ollamaOptions.NumKeep = num
 
 		return nil
@@ -168,7 +168,7 @@ func WithRunnerNumKeep(num int) Option {
 
 // WithRunnerNumBatch Set the batch size for prompt processing (default: 512).
 func WithRunnerNumBatch(num int) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.ollamaOptions.NumBatch = num
 
 		return nil
@@ -177,7 +177,7 @@ func WithRunnerNumBatch(num int) Option {
 
 // WithRunnerNumThread Set the number of threads to use during computation (default: auto).
 func WithRunnerNumThread(num int) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.ollamaOptions.NumThread = num
 
 		return nil
@@ -186,7 +186,7 @@ func WithRunnerNumThread(num int) Option {
 
 // WithRunnerNumGQA The number of GQA groups in the transformer layer. Required for some models.
 func WithRunnerNumGQA(num int) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.ollamaOptions.NumGQA = num
 
 		return nil
@@ -196,7 +196,7 @@ func WithRunnerNumGQA(num int) Option {
 // WithRunnerNumGPU The number of layers to send to the GPU(s).
 // On macOS it defaults to 1 to enable metal support, 0 to disable.
 func WithRunnerNumGPU(num int) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.ollamaOptions.NumGPU = num
 
 		return nil
@@ -208,7 +208,7 @@ func WithRunnerNumGPU(num int) Option {
 // The GPU in question will use slightly more VRAM to store a scratch buffer for temporary results.
 // By default GPU 0 is used.
 func WithRunnerMainGPU(num int) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.ollamaOptions.MainGPU = num
 
 		return nil
@@ -218,7 +218,7 @@ func WithRunnerMainGPU(num int) Option {
 // WithRunnerLowVRAM Do not allocate a VRAM scratch buffer for holding temporary results.
 // Reduces VRAM usage at the cost of performance, particularly prompt processing speed.
 func WithRunnerLowVRAM(val bool) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.ollamaOptions.LowVRAM = val
 
 		return nil
@@ -227,7 +227,7 @@ func WithRunnerLowVRAM(val bool) Option {
 
 // WithRunnerF16KV If set to falsem, use 32-bit floats instead of 16-bit floats for memory key+value.
 func WithRunnerF16KV(val bool) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.ollamaOptions.F16KV = val
 
 		return nil
@@ -236,7 +236,7 @@ func WithRunnerF16KV(val bool) Option {
 
 // WithRunnerLogitsAll Return logits for all tokens, not just the last token.
 func WithRunnerLogitsAll(val bool) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.ollamaOptions.LogitsAll = val
 
 		return nil
@@ -245,7 +245,7 @@ func WithRunnerLogitsAll(val bool) Option {
 
 // WithRunnerVocabOnly Only load the vocabulary, no weights.
 func WithRunnerVocabOnly(val bool) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.ollamaOptions.VocabOnly = val
 
 		return nil
@@ -256,7 +256,7 @@ func WithRunnerVocabOnly(val bool) Option {
 // By default, models are mapped into memory, which allows the system to load only the necessary parts
 // of the model as needed.
 func WithRunnerUseMMap(val bool) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.ollamaOptions.UseMMap = val
 
 		return nil
@@ -265,7 +265,7 @@ func WithRunnerUseMMap(val bool) Option {
 
 // WithRunnerUseMLock Force system to keep model in RAM.
 func WithRunnerUseMLock(val bool) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.ollamaOptions.UseMLock = val
 
 		return nil
@@ -274,7 +274,7 @@ func WithRunnerUseMLock(val bool) Option {
 
 // WithRunnerEmbeddingOnly Only return the embbeding.
 func WithRunnerEmbeddingOnly(val bool) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.ollamaOptions.EmbeddingOnly = val
 
 		return nil
@@ -283,7 +283,7 @@ func WithRunnerEmbeddingOnly(val bool) Option {
 
 // WithRunnerRopeFrequencyBase RoPE base frequency (default: loaded from model).
 func WithRunnerRopeFrequencyBase(val float32) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.ollamaOptions.RopeFrequencyBase = val
 
 		return nil
@@ -292,7 +292,7 @@ func WithRunnerRopeFrequencyBase(val float32) Option {
 
 // WithRunnerRopeFrequencyScale Rope frequency scaling factor (default: loaded from model).
 func WithRunnerRopeFrequencyScale(val float32) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.ollamaOptions.RopeFrequencyScale = val
 
 		return nil
@@ -302,7 +302,7 @@ func WithRunnerRopeFrequencyScale(val float32) Option {
 // WithPredictTFSZ Tail free sampling is used to reduce the impact of less probable tokens from the output.
 // A higher value (e.g., 2.0) will reduce the impact more, while a value of 1.0 disables this setting (default: 1).
 func WithPredictTFSZ(val float32) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.ollamaOptions.TFSZ = val
 
 		return nil
@@ -311,7 +311,7 @@ func WithPredictTFSZ(val float32) Option {
 
 // WithPredictTypicalP Enable locally typical sampling with parameter p (default: 1.0, 1.0 = disabled).
 func WithPredictTypicalP(val float32) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.ollamaOptions.TypicalP = val
 
 		return nil
@@ -321,7 +321,7 @@ func WithPredictTypicalP(val float32) Option {
 // WithPredictRepeatLastN Sets how far back for the model to look back to prevent repetition
 // (Default: 64, 0 = disabled, -1 = num_ctx).
 func WithPredictRepeatLastN(val int) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.ollamaOptions.RepeatLastN = val
 
 		return nil
@@ -331,7 +331,7 @@ func WithPredictRepeatLastN(val int) Option {
 // WithPredictMirostat Enable Mirostat sampling for controlling perplexity
 // (default: 0, 0 = disabled, 1 = Mirostat, 2 = Mirostat 2.0).
 func WithPredictMirostat(val int) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.ollamaOptions.Mirostat = val
 
 		return nil
@@ -341,7 +341,7 @@ func WithPredictMirostat(val int) Option {
 // WithPredictMirostatTau Controls the balance between coherence and diversity of the output.
 // A lower value will result in more focused and coherent text (Default: 5.0).
 func WithPredictMirostatTau(val float32) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.ollamaOptions.MirostatTau = val
 
 		return nil
@@ -352,7 +352,7 @@ func WithPredictMirostatTau(val float32) Option {
 // A lower learning rate will result in slower adjustments, while a higher learning rate will make the
 // algorithm more responsive (Default: 0.1).
 func WithPredictMirostatEta(val float32) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.ollamaOptions.MirostatEta = val
 
 		return nil
@@ -361,7 +361,7 @@ func WithPredictMirostatEta(val float32) Option {
 
 // WithPredictPenalizeNewline Penalize newline tokens when applying the repeat penalty (default: true).
 func WithPredictPenalizeNewline(val bool) Option {
-	return func(opts *options) error {
+	return func(opts *Options) error {
 		opts.ollamaOptions.PenalizeNewline = val
 
 		return nil

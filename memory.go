@@ -16,3 +16,16 @@ type Memory interface {
 	// Clear memory contents.
 	Clear(ctx context.Context) error
 }
+
+var _ Memory = EmptyMemory{}
+
+// EmptyMemory that does nothing. Useful for embedding.
+type EmptyMemory struct{}
+
+func (EmptyMemory) Variables(context.Context) []string { return nil }
+func (EmptyMemory) LoadVariables(context.Context, map[string]any) (map[string]any, error) {
+	return make(map[string]any), nil
+}
+func (EmptyMemory) SaveContext(context.Context, map[string]any, map[string]any) error { return nil }
+func (EmptyMemory) Clear(context.Context) error                                       { return nil }
+func (EmptyMemory) MemoryKey(context.Context) string                                  { return "" }

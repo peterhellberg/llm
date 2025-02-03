@@ -1,12 +1,10 @@
-package retrievalqa
+package retrievalqachain
 
 import (
 	"context"
 	"fmt"
 
 	"github.com/peterhellberg/llm"
-	"github.com/peterhellberg/llm/chains"
-	"github.com/peterhellberg/llm/memory"
 )
 
 var _ llm.Chain = Chain{}
@@ -72,7 +70,7 @@ func (c Chain) Call(ctx context.Context, values map[string]any, options ...llm.C
 		"input_documents": docs,
 	}
 
-	result, err := chains.Call(ctx, c.CombineDocumentsChain, inputValues, options...)
+	result, err := llm.ChainCall(ctx, c.CombineDocumentsChain, inputValues, options...)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +84,7 @@ func (c Chain) Call(ctx context.Context, values map[string]any, options ...llm.C
 
 // Memory returns empty memory.
 func (c Chain) Memory() llm.Memory {
-	return memory.Empty{}
+	return llm.EmptyMemory{}
 }
 
 func (c Chain) InputKeys() []string {

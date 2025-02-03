@@ -58,3 +58,40 @@ type ToolHooks interface {
 	ToolEnd(ctx context.Context, output string)
 	ToolError(ctx context.Context, err error)
 }
+
+var _ Hooks = EmptyHooks{}
+
+// EmptyHooks hooks that does nothing. Useful for embedding.
+type EmptyHooks struct{}
+
+func (EmptyHooks) Text(context.Context, string)          {}
+func (EmptyHooks) StreamingFunc(context.Context, []byte) {}
+
+// Agent hooks
+
+func (EmptyHooks) AgentAction(context.Context, AgentAction) {}
+func (EmptyHooks) AgentFinish(context.Context, AgentFinish) {}
+
+// Chain hooks
+
+func (EmptyHooks) ChainStart(context.Context, map[string]any) {}
+func (EmptyHooks) ChainError(context.Context, error)          {}
+func (EmptyHooks) ChainEnd(context.Context, map[string]any)   {}
+
+// Provider hooks
+
+func (EmptyHooks) ProviderStart(context.Context, []string)                      {}
+func (EmptyHooks) ProviderGenerateContentStart(context.Context, []Message)      {}
+func (EmptyHooks) ProviderGenerateContentEnd(context.Context, *ContentResponse) {}
+func (EmptyHooks) ProviderError(context.Context, error)                         {}
+
+// Retriever  hooks
+
+func (EmptyHooks) RetrieverStart(context.Context, string)           {}
+func (EmptyHooks) RetrieverEnd(context.Context, string, []Document) {}
+
+// Tool hooks
+
+func (EmptyHooks) ToolStart(context.Context, string) {}
+func (EmptyHooks) ToolError(context.Context, error)  {}
+func (EmptyHooks) ToolEnd(context.Context, string)   {}

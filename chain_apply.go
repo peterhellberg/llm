@@ -1,16 +1,14 @@
-package chains
+package llm
 
 import (
 	"context"
 	"sync"
-
-	"github.com/peterhellberg/llm"
 )
 
 const defaultApplyMaxNumberWorkers = 5
 
-// Apply executes the chain for each of the inputs asynchronously.
-func Apply(ctx context.Context, c llm.Chain, inputValues []map[string]any, maxWorkers int, options ...llm.ChainOption) ([]map[string]any, error) {
+// ChainApply executes the chain for each of the inputs asynchronously.
+func ChainApply(ctx context.Context, c Chain, inputValues []map[string]any, maxWorkers int, options ...ChainOption) ([]map[string]any, error) {
 	var (
 		inputJobs   = make(chan applyInputJob, len(inputValues))
 		resultsChan = make(chan applyResult, len(inputValues))
@@ -35,7 +33,7 @@ func Apply(ctx context.Context, c llm.Chain, inputValues []map[string]any, maxWo
 						return
 					}
 
-					res, err := Call(ctx, c, input.input, options...)
+					res, err := ChainCall(ctx, c, input.input, options...)
 
 					resultsChan <- applyResult{
 						result: res,

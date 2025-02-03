@@ -1,8 +1,6 @@
-package prompts
+package llm
 
-import "github.com/peterhellberg/llm"
-
-var _ llm.Prompt = String("")
+var _ Prompt = String("")
 
 // String is a prompt value that is a string.
 type String string
@@ -12,9 +10,9 @@ func (s String) String() string {
 }
 
 // Messages returns a single-element ChatMessage slice.
-func (s String) Messages() []llm.ChatMessage {
-	return []llm.ChatMessage{
-		llm.HumanChatMessage{
+func (s String) Messages() []ChatMessage {
+	return []ChatMessage{
+		HumanChatMessage{
 			Content: string(s),
 		},
 	}

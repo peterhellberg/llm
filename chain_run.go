@@ -1,13 +1,9 @@
-package chains
+package llm
 
-import (
-	"context"
+import "context"
 
-	"github.com/peterhellberg/llm"
-)
-
-// Run can be used to execute a chain if the chain only expects one input and one string output.
-func Run(ctx context.Context, c llm.Chain, input any, options ...llm.ChainOption) (string, error) {
+// ChainRun can be used to execute a chain if the chain only expects one input and one string output.
+func ChainRun(ctx context.Context, c Chain, input any, options ...ChainOption) (string, error) {
 	var (
 		inputKeys  = c.InputKeys()
 		memoryKeys = c.Memory().Variables(ctx)
@@ -33,26 +29,26 @@ func Run(ctx context.Context, c llm.Chain, input any, options ...llm.ChainOption
 	}
 
 	if len(neededKeys) != 1 {
-		return "", llm.ErrMultipleInputsInRun
+		return "", ErrMultipleInputsInRun
 	}
 
 	outputKeys := c.OutputKeys()
 	if len(outputKeys) != 1 {
-		return "", llm.ErrMultipleOutputsInRun
+		return "", ErrMultipleOutputsInRun
 	}
 
 	inputValues := map[string]any{
 		neededKeys[0]: input,
 	}
 
-	outputValues, err := Call(ctx, c, inputValues, options...)
+	outputValues, err := ChainCall(ctx, c, inputValues, options...)
 	if err != nil {
 		return "", err
 	}
 
 	outputValue, ok := outputValues[outputKeys[0]].(string)
 	if !ok {
-		return "", llm.ErrWrongOutputTypeInRun
+		return "", ErrWrongOutputTypeInRun
 	}
 
 	return outputValue, nil

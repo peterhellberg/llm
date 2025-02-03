@@ -1,12 +1,10 @@
-package stuffdocuments
+package stuffdocumentschain
 
 import (
 	"context"
 	"fmt"
 
 	"github.com/peterhellberg/llm"
-	"github.com/peterhellberg/llm/chains"
-	"github.com/peterhellberg/llm/memory"
 )
 
 var _ llm.Chain = Chain{}
@@ -57,9 +55,7 @@ func New(next llm.Chain, options ...func(*Chain)) Chain {
 }
 
 // Call handles the inner logic of the StuffDocuments chain.
-func (c Chain) Call(
-	ctx context.Context, values map[string]any, options ...llm.ChainOption,
-) (map[string]any, error) {
+func (c Chain) Call(ctx context.Context, values map[string]any, options ...llm.ChainOption) (map[string]any, error) {
 	docs, ok := values[c.InputKey].([]llm.Document)
 	if !ok {
 		return nil, fmt.Errorf("%w: %w", llm.ErrInvalidInputValues, llm.ErrInputValuesWrongType)
@@ -73,12 +69,12 @@ func (c Chain) Call(
 
 	inputValues[c.DocumentVariableName] = c.joinDocuments(docs)
 
-	return chains.Call(ctx, c.Next, inputValues, options...)
+	return llm.ChainCall(ctx, c.Next, inputValues, options...)
 }
 
 // Memory returns empty memory.
 func (c Chain) Memory() llm.Memory {
-	return memory.Empty{}
+	return llm.EmptyMemory{}
 }
 
 // InputKeys returns the expected input keys, by default "input_documents".

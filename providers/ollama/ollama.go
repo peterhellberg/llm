@@ -20,30 +20,27 @@ var (
 // Provider is an llm.Provider implementation for Ollama.
 type Provider struct {
 	client *ollama.Client
-	options
+	Options
 }
 
 // New creates a new ollama llm.Provider implementation.
-func New(opts ...Option) (*Provider, error) {
-	o := options{}
+func New(options ...Option) (*Provider, error) {
+	o := Options{}
 
-	for _, opt := range opts {
-		if err := opt(&o); err != nil {
+	for _, option := range options {
+		if err := option(&o); err != nil {
 			return nil, err
 		}
 	}
 
-	client, err := ollama.NewClient(
-		o.ollamaServerURL,
-		o.httpClient,
-	)
+	client, err := ollama.NewClient(o.ollamaServerURL, o.httpClient)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Provider{
 		client:  client,
-		options: o,
+		Options: o,
 	}, nil
 }
 
@@ -54,8 +51,8 @@ func (p *Provider) Call(ctx context.Context, prompt string, options ...llm.Conte
 
 // GenerateContent implements the Model interface.
 func (p *Provider) GenerateContent(ctx context.Context, messages []llm.Message, options ...llm.ContentOption) (*llm.ContentResponse, error) {
-	if p.Hooks != nil {
-		p.Hooks.ProviderGenerateContentStart(ctx, messages)
+	if p.hooks != nil {
+		p.hooks.ProviderGenerateContentStart(ctx, messages)
 	}
 
 	opts := llm.ContentOptions{}
@@ -132,8 +129,8 @@ func (p *Provider) GenerateContent(ctx context.Context, messages []llm.Message, 
 	}
 
 	if err := p.client.GenerateChat(ctx, req, fn); err != nil {
-		if p.Hooks != nil {
-			p.Hooks.ProviderError(ctx, err)
+		if p.hooks != nil {
+			p.hooks.ProviderError(ctx, err)
 		}
 
 		return nil, err
@@ -152,8 +149,8 @@ func (p *Provider) GenerateContent(ctx context.Context, messages []llm.Message, 
 
 	response := &llm.ContentResponse{Choices: choices}
 
-	if p.Hooks != nil {
-		p.Hooks.ProviderGenerateContentEnd(ctx, response)
+	if p.hooks != nil {
+		p.hooks.ProviderGenerateContentEnd(ctx, response)
 	}
 
 	return response, nil

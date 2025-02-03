@@ -6,14 +6,13 @@ import (
 	"io"
 
 	"github.com/peterhellberg/llm"
-	"github.com/peterhellberg/llm/hooks"
 )
 
 var _ llm.Hooks = Hooks{}
 
 // Hooks that write stream chunks as strings to the embedded Writer.
 type Hooks struct {
-	hooks.Empty
+	llm.EmptyHooks
 	io.Writer
 }
 

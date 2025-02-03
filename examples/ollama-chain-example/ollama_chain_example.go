@@ -12,7 +12,7 @@ import (
 	"github.com/peterhellberg/llm"
 	"github.com/peterhellberg/llm/chains"
 	"github.com/peterhellberg/llm/hooks/write"
-	"github.com/peterhellberg/llm/prompts"
+	"github.com/peterhellberg/llm/prompts/templates/gotemplate"
 	"github.com/peterhellberg/llm/providers/ollama"
 )
 
@@ -43,7 +43,7 @@ func run(ctx context.Context, env llm.Env, args []string, w io.Writer) error {
 	}
 
 	{ // First example
-		prompt := prompts.NewTemplate(
+		prompt := gotemplate.New(
 			"What is a good name for a company that makes {{.product}}?",
 			[]string{"product"},
 		)
@@ -59,7 +59,7 @@ func run(ctx context.Context, env llm.Env, args []string, w io.Writer) error {
 	}
 
 	{ // Second example
-		translatePrompt := prompts.NewTemplate(
+		translatePrompt := gotemplate.New(
 			"Translate the following text from {{.inputLanguage}} to {{.outputLanguage}}. {{.text}}",
 			[]string{"inputLanguage", "outputLanguage", "text"},
 		)
@@ -78,7 +78,9 @@ func run(ctx context.Context, env llm.Env, args []string, w io.Writer) error {
 			return err
 		}
 
-		out, ok := outputValues[chain.OutputKey].(string)
+		outputKeys := chain.OutputKeys()
+
+		out, ok := outputValues[outputKeys[0]].(string)
 		if !ok {
 			return fmt.Errorf("invalid chain return")
 		}

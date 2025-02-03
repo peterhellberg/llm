@@ -1,14 +1,36 @@
-package prompts
-
-import "github.com/peterhellberg/llm"
+package llm
 
 var (
-	_ llm.StringFormatter = Template{}
-	_ llm.PromptFormatter = Template{}
+	_ StringFormatter = Template{}
+	_ PromptFormatter = Template{}
 )
 
-type Formatter interface {
-	RenderTemplate(tmpl string, values map[string]any) (string, error)
+func NewTemplate(content string, variables []string, renderer Renderer, options ...TemplateOption) Template {
+	t := Template{
+		Content:   content,
+		Variables: variables,
+		Renderer:  renderer,
+	}
+
+	for _, o := range options {
+		o(&t)
+	}
+
+	return t
+}
+
+type TemplateOption func(*Template)
+
+func TemplateWithParser(parser Parser[any]) TemplateOption {
+	return func(t *Template) {
+		t.Parser = parser
+	}
+}
+
+func TemplateWithPartialVariables(partialVariables map[string]any) TemplateOption {
+	return func(t *Template) {
+		t.PartialVariables = partialVariables
+	}
 }
 
 // Template contains common fields for all prompt templates.
@@ -19,39 +41,30 @@ type Template struct {
 	// Variables is a list of variable names the prompt template expects.
 	Variables []string
 
+	// Renderer used to generate strings based on the prompt template.
+	Renderer
+
 	// Parser is a function that parses the output of the prompt template.
-	Parser llm.Parser[any]
+	Parser Parser[any]
 
 	// PartialVariables represents a map of variable names to values or functions
 	// that return values. If the value is a function, it will be called when the
 	// prompt template is rendered.
 	PartialVariables map[string]any
-
-	// Formatter used to generate strings based on the prompt template.
-	Formatter Formatter
-}
-
-// NewTemplate returns a new prompt template.
-func NewTemplate(content string, variables []string, formatter Formatter) Template {
-	return Template{
-		Content:   content,
-		Variables: variables,
-		Formatter: formatter,
-	}
 }
 
 // Format formats the prompt template and returns a string value.
 func (p Template) FormatString(values map[string]any) (string, error) {
-	resolvedValues, err := llm.ResolvePartialValues(p.PartialVariables, values)
+	resolvedValues, err := ResolvePartialValues(p.PartialVariables, values)
 	if err != nil {
 		return "", err
 	}
 
-	return p.Formatter.RenderTemplate(p.Content, resolvedValues)
+	return p.RenderTemplate(p.Content, resolvedValues)
 }
 
 // FormatPrompt formats the prompt template and returns a string prompt value.
-func (p Template) FormatPrompt(values map[string]any) (llm.Prompt, error) {
+func (p Template) FormatPrompt(values map[string]any) (Prompt, error) {
 	f, err := p.FormatString(values)
 	if err != nil {
 		return nil, err
