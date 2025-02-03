@@ -1,6 +1,7 @@
 package llm
 
 import (
+	"cmp"
 	"strconv"
 	"time"
 )
@@ -65,9 +66,5 @@ func (e *env) Int(key string, fallback int) int {
 
 // String returns a string from the env, or fallback variable
 func (e *env) String(key, fallback string) string {
-	if v := e.getenv(key); v != "" {
-		return v
-	}
-
-	return fallback
+	return cmp.Or(e.getenv(key), fallback)
 }
