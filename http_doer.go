@@ -2,7 +2,7 @@ package llm
 
 import "net/http"
 
-// HTTPRequest http requester interface.
-type HTTPRequest interface {
+// HTTPDoer interface.
+type HTTPDoer interface {
 	Do(req *http.Request) (*http.Response, error)
 }

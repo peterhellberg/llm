@@ -2,8 +2,10 @@ package llm
 
 import "context"
 
+// ChainOption is a function that configures ChainOptions.
 type ChainOption func(*ChainOptions)
 
+// Options for a chain.
 type ChainOptions struct {
 	// Model is the model to use in an LLM call.
 	Model    string

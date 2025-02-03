@@ -30,12 +30,11 @@ func (r VectorStoreRetriever) RelevantDocuments(ctx context.Context, query strin
 	return docs, nil
 }
 
-// ToRetriever takes a vector store and returns a retriever using the
-// vector store to retrieve documents.
-func ToRetriever(vs VectorStore, numDocuments int, options ...VectorStoreOption) VectorStoreRetriever {
+// NewVectorStoreRetriever takes a vector store and returns a retriever using the vector store to retrieve documents.
+func NewVectorStoreRetriever(vs VectorStore, numDocs int, options ...VectorStoreOption) VectorStoreRetriever {
 	return VectorStoreRetriever{
 		vs:      vs,
-		numDocs: numDocuments,
+		numDocs: numDocs,
 		options: options,
 	}
 }

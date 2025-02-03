@@ -1,7 +1,7 @@
 // Package llm implements a very small subset of the langchain project in Go.
 package llm
 
-// Document is the interface for interacting with a document.
+// Document structure used in LLM applications.
 type Document struct {
 	PageContent string
 	Metadata    map[string]any
