@@ -70,9 +70,9 @@ func parse(env llm.Env, args []string) (input, error) {
 	flags := flag.NewFlagSet(args[0], flag.ExitOnError)
 
 	flags.StringVar(&in.host, "ollama-host", env.String("OLLAMA_HOST", "localhost"), "Hostname where your Ollama server is running")
-	flags.StringVar(&in.model, "ollama-model", env.String("OLLAMA_MODEL", "smollm2:135m"), "Model to use by Ollama")
+	flags.StringVar(&in.model, "ollama-model", env.String("OLLAMA_MODEL", "phi4"), "Model to use by Ollama")
 
-	flags.Float64Var(&in.llmTemperature, "llm-temperature", 0.8, "LLM temperature to use")
+	flags.Float64Var(&in.llmTemperature, "llm-temperature", 0.1, "LLM temperature to use")
 
 	if err := flags.Parse(args[1:]); err != nil {
 		return in, err
