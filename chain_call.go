@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// Call is the standard function used for executing chains.
+// ChainCall is the standard function used for executing chains.
 func ChainCall(ctx context.Context, c Chain, inputValues map[string]any, options ...ChainOption) (map[string]any, error) {
 	fullValues := make(map[string]any, 0)
 
