@@ -13,7 +13,7 @@ type Value []llm.ChatMessage
 
 // String returns the chat message slice as a buffer string.
 func (v Value) String() string {
-	s, err := llm.GetBufferString(v, "Human", "AI")
+	s, err := llm.BufferString(v, "Human", "AI")
 	if err == nil {
 		return s
 	}

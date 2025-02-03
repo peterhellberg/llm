@@ -54,7 +54,7 @@ func (wb *WindowBuffer) LoadVariables(ctx context.Context, _ map[string]any) (ma
 		}, nil
 	}
 
-	bufferString, err := llm.GetBufferString(messages, wb.humanPrefix, wb.aiPrefix)
+	bufferString, err := llm.BufferString(messages, wb.humanPrefix, wb.aiPrefix)
 	if err != nil {
 		return nil, err
 	}

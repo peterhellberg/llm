@@ -47,7 +47,7 @@ func (m *Buffer) LoadVariables(ctx context.Context, _ map[string]any) (map[strin
 		}, nil
 	}
 
-	bufferString, err := llm.GetBufferString(messages, m.humanPrefix, m.aiPrefix)
+	bufferString, err := llm.BufferString(messages, m.humanPrefix, m.aiPrefix)
 	if err != nil {
 		return nil, err
 	}

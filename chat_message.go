@@ -125,8 +125,8 @@ func (tool ToolChatMessage) Type() ChatMessageType  { return ChatMessageTypeTool
 func (tool ToolChatMessage) MessageContent() string { return tool.Content }
 func (tool ToolChatMessage) ID() string             { return tool.CallID }
 
-// GetBufferString gets the buffer string of messages.
-func GetBufferString(messages []ChatMessage, humanPrefix string, aiPrefix string) (string, error) {
+// BufferString gets the buffer string of messages.
+func BufferString(messages []ChatMessage, humanPrefix string, aiPrefix string) (string, error) {
 	result := []string{}
 
 	for _, m := range messages {
