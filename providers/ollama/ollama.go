@@ -147,7 +147,9 @@ func (p *Provider) GenerateContent(ctx context.Context, messages []llm.Message, 
 		},
 	}
 
-	response := &llm.ContentResponse{Choices: choices}
+	response := &llm.ContentResponse{
+		Choices: choices,
+	}
 
 	if p.hooks != nil {
 		p.hooks.ProviderGenerateContentEnd(ctx, response)
