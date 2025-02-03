@@ -47,7 +47,7 @@ func run(ctx context.Context, env llm.Env, args []string, w io.Writer) error {
 		[]string{"product"},
 	)
 
-	chain := chains.New(provider, prompt, chains.WithHooks(hooks))
+	chain := chains.New(provider, prompt, llm.ChainWithHooks(hooks))
 
 	out, err := llm.ChainRun(ctx, chain, "socks")
 	if err != nil {
