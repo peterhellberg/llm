@@ -36,17 +36,22 @@ type Chain struct {
 	ReturnSourceDocuments bool
 }
 
-// New creates a new Chain from a retriever and a chain for
-// combining documents. The chain for combining documents is expected to
-// have the expected input values for the "question" and "input_documents"
-// key.
-func New(combineDocumentsChain llm.Chain, retriever llm.Retriever) Chain {
-	return Chain{
+// New creates a new Chain from a retriever and a chain for combining documents.
+// The chain for combining documents is expected to have the expected input values
+// for the "question" and "input_documents" key.
+func New(combineDocumentsChain llm.Chain, retriever llm.Retriever, options ...func(*Chain)) Chain {
+	c := Chain{
 		Retriever:             retriever,
 		CombineDocumentsChain: combineDocumentsChain,
 		InputKey:              defaultInputKey,
 		ReturnSourceDocuments: false,
 	}
+
+	for _, opt := range options {
+		opt(&c)
+	}
+
+	return c
 }
 
 // Call gets relevant documents from the retriever and gives them to the combine
@@ -62,10 +67,12 @@ func (c Chain) Call(ctx context.Context, values map[string]any, options ...llm.C
 		return nil, err
 	}
 
-	result, err := chains.Call(ctx, c.CombineDocumentsChain, map[string]any{
+	inputValues := map[string]any{
 		"question":        query,
 		"input_documents": docs,
-	}, options...)
+	}
+
+	result, err := chains.Call(ctx, c.CombineDocumentsChain, inputValues, options...)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +93,9 @@ func (c Chain) GetInputKeys() []string {
 }
 
 func (c Chain) GetOutputKeys() []string {
-	outputKeys := append([]string{}, c.CombineDocumentsChain.GetOutputKeys()...)
+	outputKeys := append([]string{},
+		c.CombineDocumentsChain.GetOutputKeys()...,
+	)
 
 	if c.ReturnSourceDocuments {
 		outputKeys = append(outputKeys, defaultSourceDocumentKey)

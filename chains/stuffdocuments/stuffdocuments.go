@@ -40,14 +40,20 @@ type Chain struct {
 
 // New creates a new stuff documents chain with an LLM chain used
 // after formatting the documents.
-func New(next llm.Chain) Chain {
-	return Chain{
+func New(next llm.Chain, options ...func(*Chain)) Chain {
+	c := Chain{
 		Next: next,
 
 		InputKey:             defaultInputKey,
 		DocumentVariableName: defaultDocumentVariableName,
 		Separator:            defaultSeparator,
 	}
+
+	for _, opt := range options {
+		opt(&c)
+	}
+
+	return c
 }
 
 // Call handles the inner logic of the StuffDocuments chain.
