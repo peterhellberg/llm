@@ -26,6 +26,7 @@ type ChainHooker interface {
 type AgentHooks interface {
 	AgentAction(ctx context.Context, action AgentAction)
 	AgentFinish(ctx context.Context, finish AgentFinish)
+
 	StreamingFunc(ctx context.Context, chunk []byte)
 }
 
@@ -34,6 +35,7 @@ type ChainHooks interface {
 	ChainStart(ctx context.Context, inputs map[string]any)
 	ChainEnd(ctx context.Context, outputs map[string]any)
 	ChainError(ctx context.Context, err error)
+
 	StreamingFunc(ctx context.Context, chunk []byte)
 }
 
@@ -43,6 +45,7 @@ type ProviderHooks interface {
 	ProviderGenerateContentStart(ctx context.Context, ms []Message)
 	ProviderGenerateContentEnd(ctx context.Context, res *ContentResponse)
 	ProviderError(ctx context.Context, err error)
+
 	StreamingFunc(ctx context.Context, chunk []byte)
 }
 

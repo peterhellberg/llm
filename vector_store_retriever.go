@@ -2,6 +2,8 @@ package llm
 
 import "context"
 
+var _ Retriever = VectorStoreRetriever{}
+
 // VectorStoreRetriever is a retriever for vector stores.
 type VectorStoreRetriever struct {
 	Hooks   RetrieverHooks
@@ -10,7 +12,19 @@ type VectorStoreRetriever struct {
 	options []VectorStoreOption
 }
 
-var _ Retriever = VectorStoreRetriever{}
+// NewVectorStoreRetriever takes a vector store and returns a retriever using the vector store to retrieve documents.
+func NewVectorStoreRetriever(vs VectorStore, numDocs int, options ...VectorStoreRetrieverOption) VectorStoreRetriever {
+	vsr := VectorStoreRetriever{
+		vs:      vs,
+		numDocs: numDocs,
+	}
+
+	for _, option := range options {
+		option(&vsr)
+	}
+
+	return vsr
+}
 
 // RelevantDocuments returns documents using the vector store.
 func (r VectorStoreRetriever) RelevantDocuments(ctx context.Context, query string) ([]Document, error) {
@@ -30,11 +44,17 @@ func (r VectorStoreRetriever) RelevantDocuments(ctx context.Context, query strin
 	return docs, nil
 }
 
-// NewVectorStoreRetriever takes a vector store and returns a retriever using the vector store to retrieve documents.
-func NewVectorStoreRetriever(vs VectorStore, numDocs int, options ...VectorStoreOption) VectorStoreRetriever {
-	return VectorStoreRetriever{
-		vs:      vs,
-		numDocs: numDocs,
-		options: options,
+// VectorStoreRetrieverOption is a function that configures a VectorStoreRetriever.
+type VectorStoreRetrieverOption func(*VectorStoreRetriever)
+
+func VectorStoreRetrieverWithHooks(hooks RetrieverHooks) VectorStoreRetrieverOption {
+	return func(o *VectorStoreRetriever) {
+		o.Hooks = hooks
+	}
+}
+
+func VectorStoreRetrieverWithVectorStoreOptions(options ...VectorStoreOption) VectorStoreRetrieverOption {
+	return func(o *VectorStoreRetriever) {
+		o.options = options
 	}
 }
