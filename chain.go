@@ -81,7 +81,7 @@ func (c *chain) Call(ctx context.Context, values map[string]any, options ...Chai
 		return nil, err
 	}
 
-	result, err := Call(ctx, c.provider, prompt.String(), ChainToContentOptions(options...)...)
+	result, err := Call(ctx, c.provider, prompt.String(), chainToContentOptions(options...)...)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,9 @@ func (c *chain) Call(ctx context.Context, values map[string]any, options ...Chai
 		return nil, err
 	}
 
-	return map[string]any{c.outputKey: finalOutput}, nil
+	return map[string]any{
+		c.outputKey: finalOutput,
+	}, nil
 }
 
 // Memory returns the memory.
@@ -111,7 +113,9 @@ func (c *chain) InputKeys() []string {
 
 // OutputKeys returns the output keys the chain will return.
 func (c *chain) OutputKeys() []string {
-	return []string{c.outputKey}
+	return []string{
+		c.outputKey,
+	}
 }
 
 // ChainOption is a function that configures ChainOptions.
@@ -291,7 +295,7 @@ func ChainWithMemory(memory Memory) ChainOption {
 	}
 }
 
-func ChainToContentOptions(options ...ChainOption) []ContentOption {
+func chainToContentOptions(options ...ChainOption) []ContentOption {
 	opts := &ChainOptions{}
 
 	for _, option := range options {
