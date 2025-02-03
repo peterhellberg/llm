@@ -76,19 +76,19 @@ func (c Chain) Call(
 	return chains.Call(ctx, c.Next, inputValues, options...)
 }
 
-// GetMemory returns empty memory.
-func (c Chain) GetMemory() llm.Memory {
+// Memory returns empty memory.
+func (c Chain) Memory() llm.Memory {
 	return memory.Empty{}
 }
 
-// GetInputKeys returns the expected input keys, by default "input_documents".
-func (c Chain) GetInputKeys() []string {
+// InputKeys returns the expected input keys, by default "input_documents".
+func (c Chain) InputKeys() []string {
 	return []string{c.InputKey}
 }
 
-// GetOutputKeys returns the output keys the chain will return.
-func (c Chain) GetOutputKeys() []string {
-	return append([]string{}, c.Next.GetOutputKeys()...)
+// OutputKeys returns the output keys the chain will return.
+func (c Chain) OutputKeys() []string {
+	return append([]string{}, c.Next.OutputKeys()...)
 }
 
 // joinDocuments joins the documents with the separator.

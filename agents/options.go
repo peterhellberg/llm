@@ -23,8 +23,7 @@ type Options struct {
 	extraMessages []llm.MessageFormatter
 }
 
-// Option is a function type that can be used to modify the creation of the agents
-// and executors.
+// Option is a function type that can be used to modify the creation of the agents and executors.
 type Option func(*Options)
 
 func executorDefaultOptions() Options {
@@ -53,15 +52,8 @@ func conversationalDefaultOptions() Options {
 	}
 }
 
-func openAIFunctionsDefaultOptions() Options {
-	return Options{
-		systemMessage: "You are a helpful AI assistant.",
-		outputKey:     defaultOutputKey,
-	}
-}
-
 func (co Options) getMrklPrompt(tools []llm.AgentTool) prompts.Template {
-	if co.prompt.Template != "" {
+	if co.prompt.Content != "" {
 		return co.prompt
 	}
 
@@ -74,7 +66,7 @@ func (co Options) getMrklPrompt(tools []llm.AgentTool) prompts.Template {
 }
 
 func (co Options) getConversationalPrompt(tools []llm.AgentTool) prompts.Template {
-	if co.prompt.Template != "" {
+	if co.prompt.Content != "" {
 		return co.prompt
 	}
 

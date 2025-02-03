@@ -51,8 +51,17 @@ type ChainOptions struct {
 	RepetitionPenalty    float64
 	repetitionPenaltySet bool
 
+	// OutputKey to use by the Chain.
+	OutputKey string
+
 	// Hooks for the Chain
 	Hooks ChainHooks
+
+	// Parser to use by the Chain.
+	Parser Parser[any]
+
+	// Memory to use by the Chain.
+	Memory Memory
 }
 
 // ChainWithModel is an option for LLM.Call.
@@ -142,10 +151,31 @@ func ChainWithStopWords(stopWords []string) ChainOption {
 	}
 }
 
+// ChainWithOutputKey allows setting what output key should be used by the Chain. (Defaults to "text")
+func ChainWithOutputKey(outputKey string) ChainOption {
+	return func(o *ChainOptions) {
+		o.OutputKey = outputKey
+	}
+}
+
 // ChainWithHooks allows setting custom Hooks.
 func ChainWithHooks(hooks ChainHooks) ChainOption {
 	return func(o *ChainOptions) {
 		o.Hooks = hooks
+	}
+}
+
+// ChainWithParser allows setting what parser should be used by the Chain.
+func ChainWithParser(parser Parser[any]) ChainOption {
+	return func(o *ChainOptions) {
+		o.Parser = parser
+	}
+}
+
+// ChainWithMemory allows setting what memory should be used by the Chain.
+func ChainWithMemory(memory Memory) ChainOption {
+	return func(o *ChainOptions) {
+		o.Memory = memory
 	}
 }
 

@@ -19,48 +19,48 @@ const (
 // WindowBuffer for storing conversation memory.
 type WindowBuffer struct {
 	Buffer
-	WindowSize int
+	windowSize int
 }
 
 // NewWindowBuffer is a function for crating a new window buffer memory.
-func NewWindowBuffer(conversationWindowSize int, options ...Option) *WindowBuffer {
-	if conversationWindowSize <= 0 {
-		conversationWindowSize = defaultConversationWindowSize
+func NewWindowBuffer(windowSize int, options ...Option) *WindowBuffer {
+	if windowSize <= 0 {
+		windowSize = defaultConversationWindowSize
 	}
 
 	return &WindowBuffer{
-		WindowSize: conversationWindowSize,
+		windowSize: windowSize,
 		Buffer:     *applyBufferOptions(options...),
 	}
 }
 
-// MemoryVariables uses ConversationBuffer method for memory variables.
-func (wb *WindowBuffer) MemoryVariables(ctx context.Context) []string {
-	return wb.Buffer.MemoryVariables(ctx)
+// Variables uses ConversationBuffer method for memory variables.
+func (wb *WindowBuffer) Variables(ctx context.Context) []string {
+	return wb.Buffer.Variables(ctx)
 }
 
-// LoadMemoryVariables uses ConversationBuffer method for loading memory variables.
-func (wb *WindowBuffer) LoadMemoryVariables(ctx context.Context, _ map[string]any) (map[string]any, error) {
-	messages, err := wb.ChatHistory.Messages(ctx)
+// LoadVariables uses ConversationBuffer method for loading memory variables.
+func (wb *WindowBuffer) LoadVariables(ctx context.Context, _ map[string]any) (map[string]any, error) {
+	messages, err := wb.chatHistory.Messages(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	messages, _ = wb.cutMessages(messages)
 
-	if wb.ReturnMessages {
+	if wb.returnMessages {
 		return map[string]any{
-			wb.MemoryKey: messages,
+			wb.memoryKey: messages,
 		}, nil
 	}
 
-	bufferString, err := llm.GetBufferString(messages, wb.HumanPrefix, wb.AIPrefix)
+	bufferString, err := llm.GetBufferString(messages, wb.humanPrefix, wb.aiPrefix)
 	if err != nil {
 		return nil, err
 	}
 
 	return map[string]any{
-		wb.MemoryKey: bufferString,
+		wb.memoryKey: bufferString,
 	}, nil
 }
 
@@ -71,13 +71,13 @@ func (wb *WindowBuffer) SaveContext(ctx context.Context, inputValues map[string]
 		return err
 	}
 
-	messages, err := wb.ChatHistory.Messages(ctx)
+	messages, err := wb.chatHistory.Messages(ctx)
 	if err != nil {
 		return err
 	}
 
 	if messages, ok := wb.cutMessages(messages); ok {
-		err := wb.ChatHistory.SetMessages(ctx, messages)
+		err := wb.chatHistory.SetMessages(ctx, messages)
 		if err != nil {
 			return err
 		}
@@ -92,8 +92,8 @@ func (wb *WindowBuffer) Clear(ctx context.Context) error {
 }
 
 func (wb *WindowBuffer) cutMessages(message []llm.ChatMessage) ([]llm.ChatMessage, bool) {
-	if len(message) > wb.WindowSize*defaultMessageSize {
-		return message[len(message)-wb.WindowSize*defaultMessageSize:], true
+	if len(message) > wb.windowSize*defaultMessageSize {
+		return message[len(message)-wb.windowSize*defaultMessageSize:], true
 	}
 
 	return message, false

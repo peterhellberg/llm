@@ -14,33 +14,36 @@ var (
 	_ llm.AgentHooker = &Executor{}
 )
 
-const _intermediateStepsOutputKey = "intermediateSteps"
+const intermediateStepsOutputKey = "intermediateSteps"
 
 // Executor is the chain responsible for running agents.
 type Executor struct {
-	Agent        llm.Agent
-	Memory       llm.Memory
-	Hooks        llm.AgentHooks
-	ErrorHandler *llm.ParserErrorHandler
+	Hooks llm.AgentHooks
 
-	MaxIterations           int
-	ReturnIntermediateSteps bool
+	agent        llm.Agent
+	memory       llm.Memory
+	errorHandler *llm.ParserErrorHandler
+
+	maxIterations           int
+	returnIntermediateSteps bool
 }
 
 // NewExecutor creates a new agent executor with an agent and the tools the agent can use.
-func NewExecutor(agent llm.Agent, opts ...Option) *Executor {
-	options := executorDefaultOptions()
-	for _, opt := range opts {
-		opt(&options)
+func NewExecutor(agent llm.Agent, options ...Option) *Executor {
+	opt := executorDefaultOptions()
+
+	for _, o := range options {
+		o(&opt)
 	}
 
 	return &Executor{
-		Agent:                   agent,
-		Memory:                  options.memory,
-		MaxIterations:           options.maxIterations,
-		ReturnIntermediateSteps: options.returnIntermediateSteps,
-		Hooks:                   options.hooks,
-		ErrorHandler:            options.errorHandler,
+		Hooks: opt.hooks,
+
+		agent:                   agent,
+		memory:                  opt.memory,
+		maxIterations:           opt.maxIterations,
+		returnIntermediateSteps: opt.returnIntermediateSteps,
+		errorHandler:            opt.errorHandler,
 	}
 }
 
@@ -49,11 +52,14 @@ func (e *Executor) Call(ctx context.Context, inputValues map[string]any, _ ...ll
 	if err != nil {
 		return nil, err
 	}
-	nameToTool := getNameToTool(e.Agent.AgentTools())
+
+	nameToTool := getNameToTool(e.agent.AgentTools())
 
 	steps := make([]llm.AgentStep, 0)
-	for i := 0; i < e.MaxIterations; i++ {
+
+	for i := 0; i < e.maxIterations; i++ {
 		var finish map[string]any
+
 		steps, finish, err = e.doIteration(ctx, steps, nameToTool, inputs)
 		if finish != nil || err != nil {
 			return finish, err
@@ -65,6 +71,7 @@ func (e *Executor) Call(ctx context.Context, inputValues map[string]any, _ ...ll
 			ReturnValues: map[string]any{"output": llm.ErrNotFinished.Error()},
 		})
 	}
+
 	return e.getReturn(
 		&llm.AgentFinish{ReturnValues: make(map[string]any)},
 		steps,
@@ -77,12 +84,13 @@ func (e *Executor) doIteration(
 	nameToTool map[string]llm.AgentTool,
 	inputs map[string]string,
 ) ([]llm.AgentStep, map[string]any, error) {
-	actions, finish, err := e.Agent.Plan(ctx, steps, inputs)
+	actions, finish, err := e.agent.Plan(ctx, steps, inputs)
 
-	if errors.Is(err, llm.ErrUnableToParseOutput) && e.ErrorHandler != nil {
+	if errors.Is(err, llm.ErrUnableToParseOutput) && e.errorHandler != nil {
 		formattedObservation := err.Error()
-		if e.ErrorHandler.Formatter != nil {
-			formattedObservation = e.ErrorHandler.Formatter(formattedObservation)
+
+		if e.errorHandler.Formatter != nil {
+			formattedObservation = e.errorHandler.Formatter(formattedObservation)
 		}
 
 		steps = append(steps, llm.AgentStep{
@@ -147,26 +155,26 @@ func (e *Executor) doAction(
 }
 
 func (e *Executor) getReturn(finish *llm.AgentFinish, steps []llm.AgentStep) map[string]any {
-	if e.ReturnIntermediateSteps {
-		finish.ReturnValues[_intermediateStepsOutputKey] = steps
+	if e.returnIntermediateSteps {
+		finish.ReturnValues[intermediateStepsOutputKey] = steps
 	}
 
 	return finish.ReturnValues
 }
 
-// GetInputKeys gets the input keys the agent of the executor expects.
+// InputKeys gets the input keys the agent of the executor expects.
 // Often "input".
-func (e *Executor) GetInputKeys() []string {
-	return e.Agent.InputKeys()
+func (e *Executor) InputKeys() []string {
+	return e.agent.InputKeys()
 }
 
-// GetOutputKeys gets the output keys the agent of the executor returns.
-func (e *Executor) GetOutputKeys() []string {
-	return e.Agent.OutputKeys()
+// OutputKeys gets the output keys the agent of the executor returns.
+func (e *Executor) OutputKeys() []string {
+	return e.agent.OutputKeys()
 }
 
-func (e *Executor) GetMemory() llm.Memory {
-	return e.Memory
+func (e *Executor) Memory() llm.Memory {
+	return e.memory
 }
 
 func (e *Executor) AgentHooks() llm.AgentHooks {

@@ -12,15 +12,15 @@ var _ llm.Parser[any] = Parser{}
 
 // Parser is an output parser used to parse the output of an LLM as a boolean.
 type Parser struct {
-	TrueStrings  []string
-	FalseStrings []string
+	trueStrings  []string
+	falseStrings []string
 }
 
 // New returns a bool Parser.
 func New() Parser {
 	return Parser{
-		TrueStrings:  []string{"YES", "TRUE"},
-		FalseStrings: []string{"NO", "FALSE"},
+		trueStrings:  []string{"YES", "TRUE"},
+		falseStrings: []string{"NO", "FALSE"},
 	}
 }
 
@@ -32,18 +32,18 @@ func (p Parser) FormatInstructions() string {
 func (p Parser) parse(text string) (bool, error) {
 	text = normalize(text)
 
-	if slices.Contains(p.TrueStrings, text) {
+	if slices.Contains(p.trueStrings, text) {
 		return true, nil
 	}
 
-	if slices.Contains(p.FalseStrings, text) {
+	if slices.Contains(p.falseStrings, text) {
 		return false, nil
 	}
 
 	return false, llm.ParseError{
 		Text: text,
 		Reason: fmt.Sprintf("Expected output to one of %v, received %s",
-			append(p.TrueStrings, p.FalseStrings...), text),
+			append(p.trueStrings, p.falseStrings...), text),
 	}
 }
 

@@ -18,31 +18,45 @@ const defaultOutputKey = "text"
 type Chain struct {
 	Hooks llm.ChainHooks
 
-	prompter llm.Prompter
+	prompter llm.PromptFormatter
 	provider llm.Provider
 	parser   llm.Parser[any]
 	memory   llm.Memory
 
-	OutputKey string
+	outputKey string
 }
 
 // New chain with a LLM provider and a prompt.
-func New(provider llm.Provider, prompter llm.Prompter, opts ...llm.ChainOption) *Chain {
+func New(provider llm.Provider, prompter llm.PromptFormatter, opts ...llm.ChainOption) *Chain {
 	opt := &llm.ChainOptions{}
 
 	for _, o := range opts {
 		o(opt)
 	}
 
+	{
+		if opt.Parser == nil {
+			opt.Parser = parsers.Empty{}
+		}
+
+		if opt.Memory == nil {
+			opt.Memory = memory.Empty{}
+		}
+
+		if opt.OutputKey == "" {
+			opt.OutputKey = defaultOutputKey
+		}
+	}
+
 	return &Chain{
-		Hooks: opt.Hooks,
-
-		prompter: prompter,
 		provider: provider,
-		parser:   parsers.Empty{},
-		memory:   memory.Empty{},
+		prompter: prompter,
 
-		OutputKey: defaultOutputKey,
+		parser:    opt.Parser,
+		memory:    opt.Memory,
+		outputKey: opt.OutputKey,
+
+		Hooks: opt.Hooks,
 	}
 }
 
@@ -65,24 +79,25 @@ func (c Chain) Call(ctx context.Context, values map[string]any, options ...llm.C
 		return nil, err
 	}
 
-	return map[string]any{c.OutputKey: finalOutput}, nil
+	return map[string]any{c.outputKey: finalOutput}, nil
 }
 
-// GetMemory returns the memory.
-func (c Chain) GetMemory() llm.Memory {
+// Memory returns the memory.
+func (c Chain) Memory() llm.Memory {
 	return c.memory
 }
 
+// ChainHooks returns the hooks for the chain.
 func (c Chain) ChainHooks() llm.ChainHooks {
 	return c.Hooks
 }
 
-// GetInputKeys returns the expected input keys.
-func (c Chain) GetInputKeys() []string {
-	return append([]string{}, c.prompter.GetInputVariables()...)
+// InputKeys returns the expected input keys.
+func (c Chain) InputKeys() []string {
+	return append([]string{}, c.prompter.InputVariables()...)
 }
 
-// GetOutputKeys returns the output keys the chain will return.
-func (c Chain) GetOutputKeys() []string {
-	return []string{c.OutputKey}
+// OutputKeys returns the output keys the chain will return.
+func (c Chain) OutputKeys() []string {
+	return []string{c.outputKey}
 }

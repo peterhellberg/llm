@@ -9,9 +9,9 @@ type Chain interface {
 	// functions that handles the memory and other aspects of the chain.
 	Call(ctx context.Context, inputs map[string]any, options ...ChainOption) (map[string]any, error)
 	// GetMemory gets the memory of the chain.
-	GetMemory() Memory
-	// GetInputKeys returns the input keys the chain expects.
-	GetInputKeys() []string
-	// GetOutputKeys returns the output keys the chain returns.
-	GetOutputKeys() []string
+	Memory() Memory
+	// InputKeys returns the input keys the chain expects.
+	InputKeys() []string
+	// OutputKeys returns the output keys the chain returns.
+	OutputKeys() []string
 }

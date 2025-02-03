@@ -6,6 +6,7 @@ import (
 
 	"github.com/peterhellberg/llm"
 	"github.com/peterhellberg/llm/prompts"
+	"github.com/peterhellberg/llm/prompts/formatters/gotemplate"
 )
 
 const (
@@ -32,12 +33,12 @@ Question: {{.input}}
 )
 
 func createMRKLPrompt(tools []llm.AgentTool, prefix, instructions, suffix string) prompts.Template {
-	template := strings.Join([]string{prefix, instructions, suffix}, "\n\n")
+	content := strings.Join([]string{prefix, instructions, suffix}, "\n\n")
 
 	return prompts.Template{
-		Template:       template,
-		TemplateFormat: prompts.TemplateFormatGoTemplate,
-		InputVariables: []string{"input", "agent_scratchpad", "today"},
+		Formatter: gotemplate.Formatter{},
+		Content:   content,
+		Variables: []string{"input", "agent_scratchpad", "today"},
 		PartialVariables: map[string]any{
 			"tool_names":        toolNames(tools),
 			"tool_descriptions": toolDescriptions(tools),

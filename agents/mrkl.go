@@ -95,7 +95,7 @@ func (a *OneShotZeroAgent) Plan(
 }
 
 func (a *OneShotZeroAgent) InputKeys() []string {
-	chainInputs := a.Chain.GetInputKeys()
+	chainInputs := a.Chain.InputKeys()
 
 	// Remove inputs given in plan.
 	agentInput := make([]string, 0, len(chainInputs))

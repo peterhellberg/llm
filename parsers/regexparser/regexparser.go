@@ -15,15 +15,15 @@ func New(str string) Parser {
 	outputKeys := expression.SubexpNames()[1:]
 
 	return Parser{
-		Expression: expression,
-		OutputKeys: outputKeys,
+		expression: expression,
+		outputKeys: outputKeys,
 	}
 }
 
 // Parser is an output parser used to parse the output of an LLM as a map.
 type Parser struct {
-	Expression *regexp.Regexp
-	OutputKeys []string
+	expression *regexp.Regexp
+	outputKeys []string
 }
 
 // FormatInstructions returns instructions on the expected output format.
@@ -50,12 +50,12 @@ func (p Parser) ParseWithPrompt(text string, _ llm.Prompt) (any, error) {
 }
 
 func (p Parser) parse(text string) (map[string]string, error) {
-	match := p.Expression.FindStringSubmatch(text)
+	match := p.expression.FindStringSubmatch(text)
 
 	if len(match) == 0 {
 		return nil, llm.ParseError{
 			Text:   text,
-			Reason: fmt.Sprintf("No match found for expression %s", p.Expression),
+			Reason: fmt.Sprintf("No match found for expression %s", p.expression),
 		}
 	}
 
@@ -64,7 +64,7 @@ func (p Parser) parse(text string) (map[string]string, error) {
 
 	matches := make(map[string]string, len(match))
 
-	for i, name := range p.OutputKeys {
+	for i, name := range p.outputKeys {
 		matches[name] = match[i]
 	}
 

@@ -15,7 +15,7 @@ func Call(ctx context.Context, c llm.Chain, inputValues map[string]any, options 
 		fullValues[key] = value
 	}
 
-	newValues, err := c.GetMemory().LoadMemoryVariables(ctx, inputValues)
+	newValues, err := c.Memory().LoadVariables(ctx, inputValues)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func Call(ctx context.Context, c llm.Chain, inputValues map[string]any, options 
 		chainHooks.ChainEnd(ctx, outputValues)
 	}
 
-	if err = c.GetMemory().SaveContext(ctx, inputValues, outputValues); err != nil {
+	if err = c.Memory().SaveContext(ctx, inputValues, outputValues); err != nil {
 		return outputValues, err
 	}
 
@@ -68,7 +68,7 @@ func call(ctx context.Context, c llm.Chain, fullValues map[string]any, options .
 }
 
 func validateInputs(c llm.Chain, inputValues map[string]any) error {
-	for _, k := range c.GetInputKeys() {
+	for _, k := range c.InputKeys() {
 		if _, ok := inputValues[k]; !ok {
 			return fmt.Errorf("%w: %w: %v", llm.ErrInvalidInputValues, llm.ErrMissingInputValues, k)
 		}
@@ -78,7 +78,7 @@ func validateInputs(c llm.Chain, inputValues map[string]any) error {
 }
 
 func validateOutputs(c llm.Chain, outputValues map[string]any) error {
-	for _, k := range c.GetOutputKeys() {
+	for _, k := range c.OutputKeys() {
 		if _, ok := outputValues[k]; !ok {
 			return fmt.Errorf("%w: %v", llm.ErrInvalidOutputValues, k)
 		}

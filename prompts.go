@@ -9,13 +9,13 @@ type StringFormatter interface {
 // of messages.
 type MessageFormatter interface {
 	FormatMessages(values map[string]any) ([]ChatMessage, error)
-	GetInputVariables() []string
+	InputVariables() []string
 }
 
-// Prompter is an interface for formatting a map of values into a prompt.
-type Prompter interface {
+// PromptFormatter is an interface for formatting a map of values into a prompt.
+type PromptFormatter interface {
 	FormatPrompt(values map[string]any) (Prompt, error)
-	GetInputVariables() []string
+	InputVariables() []string
 }
 
 // Prompt is the interface that all prompt values must implement.

@@ -84,17 +84,18 @@ func (c Chain) Call(ctx context.Context, values map[string]any, options ...llm.C
 	return result, nil
 }
 
-func (c Chain) GetMemory() llm.Memory {
+// Memory returns empty memory.
+func (c Chain) Memory() llm.Memory {
 	return memory.Empty{}
 }
 
-func (c Chain) GetInputKeys() []string {
+func (c Chain) InputKeys() []string {
 	return []string{c.InputKey}
 }
 
-func (c Chain) GetOutputKeys() []string {
+func (c Chain) OutputKeys() []string {
 	outputKeys := append([]string{},
-		c.CombineDocumentsChain.GetOutputKeys()...,
+		c.CombineDocumentsChain.OutputKeys()...,
 	)
 
 	if c.ReturnSourceDocuments {

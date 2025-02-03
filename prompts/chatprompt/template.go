@@ -5,7 +5,7 @@ import "github.com/peterhellberg/llm"
 var (
 	_ llm.StringFormatter  = Template{}
 	_ llm.MessageFormatter = Template{}
-	_ llm.Prompter         = Template{}
+	_ llm.PromptFormatter  = Template{}
 )
 
 // ChatPromptTemplate is a prompt template for chat messages.
@@ -58,12 +58,12 @@ func (p Template) FormatMessages(values map[string]any) ([]llm.ChatMessage, erro
 	return promptValue.Messages(), err
 }
 
-// GetInputVariables returns the input variables the prompt expect.
-func (p Template) GetInputVariables() []string {
+// InputVariables returns the input variables the prompt expect.
+func (p Template) InputVariables() []string {
 	inputVariablesMap := make(map[string]bool, 0)
 
 	for _, msg := range p.Messages {
-		for _, variable := range msg.GetInputVariables() {
+		for _, variable := range msg.InputVariables() {
 			inputVariablesMap[variable] = true
 		}
 	}

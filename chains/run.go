@@ -9,8 +9,8 @@ import (
 // Run can be used to execute a chain if the chain only expects one input and one string output.
 func Run(ctx context.Context, c llm.Chain, input any, options ...llm.ChainOption) (string, error) {
 	var (
-		inputKeys  = c.GetInputKeys()
-		memoryKeys = c.GetMemory().MemoryVariables(ctx)
+		inputKeys  = c.InputKeys()
+		memoryKeys = c.Memory().Variables(ctx)
 		neededKeys = make([]string, 0, len(inputKeys))
 	)
 
@@ -36,7 +36,7 @@ func Run(ctx context.Context, c llm.Chain, input any, options ...llm.ChainOption
 		return "", llm.ErrMultipleInputsInRun
 	}
 
-	outputKeys := c.GetOutputKeys()
+	outputKeys := c.OutputKeys()
 	if len(outputKeys) != 1 {
 		return "", llm.ErrMultipleOutputsInRun
 	}

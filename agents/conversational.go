@@ -11,6 +11,7 @@ import (
 	"github.com/peterhellberg/llm"
 	"github.com/peterhellberg/llm/chains"
 	"github.com/peterhellberg/llm/prompts"
+	"github.com/peterhellberg/llm/prompts/formatters/gotemplate"
 )
 
 const (
@@ -95,7 +96,7 @@ func (a *ConversationalAgent) Plan(
 }
 
 func (a *ConversationalAgent) InputKeys() []string {
-	chainInputs := a.Chain.GetInputKeys()
+	chainInputs := a.Chain.InputKeys()
 
 	// Remove inputs given in plan.
 	agentInput := make([]string, 0, len(chainInputs))
@@ -145,13 +146,18 @@ func (a *ConversationalAgent) parseOutput(output string) ([]llm.AgentAction, *ll
 	}
 
 	r := regexp.MustCompile(`Action: (.*?)[\n]*Action Input: (.*)`)
+
 	matches := r.FindStringSubmatch(output)
 	if len(matches) == 0 {
 		return nil, nil, fmt.Errorf("%w: %s", llm.ErrUnableToParseOutput, output)
 	}
 
 	return []llm.AgentAction{
-		{Tool: strings.TrimSpace(matches[1]), ToolInput: strings.TrimSpace(matches[2]), Log: output},
+		{
+			Tool:      strings.TrimSpace(matches[1]),
+			ToolInput: strings.TrimSpace(matches[2]),
+			Log:       output,
+		},
 	}, nil, nil
 }
 
@@ -165,12 +171,12 @@ var defaultConversationalFormatInstructions string
 var defaultConversationalSuffix string
 
 func createConversationalPrompt(tools []llm.AgentTool, prefix, instructions, suffix string) prompts.Template {
-	template := strings.Join([]string{prefix, instructions, suffix}, "\n\n")
+	content := strings.Join([]string{prefix, instructions, suffix}, "\n\n")
 
 	return prompts.Template{
-		Template:       template,
-		TemplateFormat: prompts.TemplateFormatGoTemplate,
-		InputVariables: []string{"input", "agent_scratchpad"},
+		Formatter: gotemplate.Formatter{},
+		Content:   content,
+		Variables: []string{"input", "agent_scratchpad"},
 		PartialVariables: map[string]any{
 			"tool_names":        toolNames(tools),
 			"tool_descriptions": toolDescriptions(tools),

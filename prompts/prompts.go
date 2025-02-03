@@ -4,35 +4,39 @@ import "github.com/peterhellberg/llm"
 
 var (
 	_ llm.StringFormatter = Template{}
-	_ llm.Prompter        = Template{}
+	_ llm.PromptFormatter = Template{}
 )
+
+type Formatter interface {
+	RenderTemplate(tmpl string, values map[string]any) (string, error)
+}
 
 // Template contains common fields for all prompt templates.
 type Template struct {
-	// Template is the prompt template.
-	Template string
+	// Content of the prompt template.
+	Content string
 
-	// A list of variable names the prompt template expects.
-	InputVariables []string
+	// Variables is a list of variable names the prompt template expects.
+	Variables []string
 
-	// TemplateFormat is the format of the prompt template.
-	TemplateFormat TemplateFormat
-
-	// OutputParser is a function that parses the output of the prompt template.
-	OutputParser llm.Parser[any]
+	// Parser is a function that parses the output of the prompt template.
+	Parser llm.Parser[any]
 
 	// PartialVariables represents a map of variable names to values or functions
 	// that return values. If the value is a function, it will be called when the
 	// prompt template is rendered.
 	PartialVariables map[string]any
+
+	// Formatter used to generate strings based on the prompt template.
+	Formatter Formatter
 }
 
 // NewTemplate returns a new prompt template.
-func NewTemplate(template string, inputVars []string) Template {
+func NewTemplate(content string, variables []string, formatter Formatter) Template {
 	return Template{
-		Template:       template,
-		InputVariables: inputVars,
-		TemplateFormat: TemplateFormatGoTemplate,
+		Content:   content,
+		Variables: variables,
+		Formatter: formatter,
 	}
 }
 
@@ -43,7 +47,7 @@ func (p Template) FormatString(values map[string]any) (string, error) {
 		return "", err
 	}
 
-	return RenderTemplate(p.Template, p.TemplateFormat, resolvedValues)
+	return p.Formatter.RenderTemplate(p.Content, resolvedValues)
 }
 
 // FormatPrompt formats the prompt template and returns a string prompt value.
@@ -56,7 +60,7 @@ func (p Template) FormatPrompt(values map[string]any) (llm.Prompt, error) {
 	return String(f), nil
 }
 
-// GetInputVariables returns the input variables the prompt expect.
-func (p Template) GetInputVariables() []string {
-	return p.InputVariables
+// InputVariables returns the input variables the prompt expect.
+func (p Template) InputVariables() []string {
+	return p.Variables
 }

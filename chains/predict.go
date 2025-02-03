@@ -13,7 +13,7 @@ func Predict(ctx context.Context, c llm.Chain, inputValues map[string]any, optio
 		return "", err
 	}
 
-	outputKeys := c.GetOutputKeys()
+	outputKeys := c.OutputKeys()
 	if len(outputKeys) != 1 {
 		return "", llm.ErrMultipleOutputsInPredict
 	}

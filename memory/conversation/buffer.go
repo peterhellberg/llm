@@ -11,14 +11,14 @@ var _ llm.Memory = &Buffer{}
 
 // Buffer is a simple form of memory that remembers previous conversational back and forth directly.
 type Buffer struct {
-	ChatHistory llm.ChatMessageHistory
+	chatHistory llm.ChatMessageHistory
 
-	ReturnMessages bool
-	InputKey       string
-	OutputKey      string
-	HumanPrefix    string
-	AIPrefix       string
-	MemoryKey      string
+	returnMessages bool
+	inputKey       string
+	outputKey      string
+	humanPrefix    string
+	aiPrefix       string
+	memoryKey      string
 }
 
 // NewBuffer is a function for crating a new buffer memory.
@@ -26,34 +26,34 @@ func NewBuffer(options ...Option) *Buffer {
 	return applyBufferOptions(options...)
 }
 
-// MemoryVariables gets the input key the buffer memory class will load dynamically.
-func (m *Buffer) MemoryVariables(context.Context) []string {
-	return []string{m.MemoryKey}
+// Variables gets the input key the buffer memory class will load dynamically.
+func (m *Buffer) Variables(context.Context) []string {
+	return []string{m.memoryKey}
 }
 
-// LoadMemoryVariables returns the previous chat messages stored in memory. Previous chat messages
+// LoadVariables returns the previous chat messages stored in memory. Previous chat messages
 // are returned in a map with the key specified in the MemoryKey field. This key defaults to
 // "history". If ReturnMessages is set to true the output is a slice of llms.ChatMessage. Otherwise,
 // the output is a buffer string of the chat messages.
-func (m *Buffer) LoadMemoryVariables(ctx context.Context, _ map[string]any) (map[string]any, error) {
-	messages, err := m.ChatHistory.Messages(ctx)
+func (m *Buffer) LoadVariables(ctx context.Context, _ map[string]any) (map[string]any, error) {
+	messages, err := m.chatHistory.Messages(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	if m.ReturnMessages {
+	if m.returnMessages {
 		return map[string]any{
-			m.MemoryKey: messages,
+			m.memoryKey: messages,
 		}, nil
 	}
 
-	bufferString, err := llm.GetBufferString(messages, m.HumanPrefix, m.AIPrefix)
+	bufferString, err := llm.GetBufferString(messages, m.humanPrefix, m.aiPrefix)
 	if err != nil {
 		return nil, err
 	}
 
 	return map[string]any{
-		m.MemoryKey: bufferString,
+		m.memoryKey: bufferString,
 	}, nil
 }
 
@@ -65,30 +65,30 @@ func (m *Buffer) LoadMemoryVariables(ctx context.Context, _ map[string]any) (map
 // values. The values in the input and output values used to save a user and AI message must
 // be strings.
 func (m *Buffer) SaveContext(ctx context.Context, inputValues map[string]any, outputValues map[string]any) error {
-	userInputValue, err := GetInputValue(inputValues, m.InputKey)
+	userInputValue, err := GetInputValue(inputValues, m.inputKey)
 	if err != nil {
 		return err
 	}
 
-	if err := m.ChatHistory.AddUserMessage(ctx, userInputValue); err != nil {
+	if err := m.chatHistory.AddUserMessage(ctx, userInputValue); err != nil {
 		return err
 	}
 
-	aiOutputValue, err := GetInputValue(outputValues, m.OutputKey)
+	aiOutputValue, err := GetInputValue(outputValues, m.outputKey)
 	if err != nil {
 		return err
 	}
 
-	return m.ChatHistory.AddAIMessage(ctx, aiOutputValue)
+	return m.chatHistory.AddAIMessage(ctx, aiOutputValue)
 }
 
 // Clear sets the chat messages to a new and empty chat message history.
 func (m *Buffer) Clear(ctx context.Context) error {
-	return m.ChatHistory.Clear(ctx)
+	return m.chatHistory.Clear(ctx)
 }
 
-func (m *Buffer) GetMemoryKey(context.Context) string {
-	return m.MemoryKey
+func (m *Buffer) MemoryKey(context.Context) string {
+	return m.memoryKey
 }
 
 func GetInputValue(inputValues map[string]any, inputKey string) (string, error) {

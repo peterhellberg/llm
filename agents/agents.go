@@ -9,6 +9,7 @@ const (
 	// ZeroShotReactDescription is an AgentType constant that represents
 	// the "zeroShotReactDescription" agent type.
 	ZeroShotReactDescription AgentType = "zeroShotReactDescription"
+
 	// ConversationalReactDescription is an AgentType constant that represents
 	// the "conversationalReactDescription" agent type.
 	ConversationalReactDescription AgentType = "conversationalReactDescription"
