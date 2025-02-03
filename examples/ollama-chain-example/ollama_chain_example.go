@@ -10,9 +10,6 @@ import (
 	"strings"
 
 	"github.com/peterhellberg/llm"
-	"github.com/peterhellberg/llm/chains"
-	"github.com/peterhellberg/llm/hooks/write"
-	"github.com/peterhellberg/llm/prompts/templates/gotemplate"
 	"github.com/peterhellberg/llm/providers/ollama"
 )
 
@@ -31,26 +28,23 @@ func run(ctx context.Context, env llm.Env, args []string, w io.Writer) error {
 		return err
 	}
 
-	hooks := write.Hooks{Writer: w}
-
 	provider, err := ollama.New(
 		ollama.WithHost(in.host),
 		ollama.WithModel(in.model),
-		ollama.WithHooks(hooks),
 	)
 	if err != nil {
 		return err
 	}
 
 	{ // First example
-		prompt := gotemplate.New(
+		prompt := llm.GoTemplate(
 			"What is a good name for a company that makes {{.product}}?",
 			[]string{"product"},
 		)
 
-		chain := chains.New(provider, prompt, llm.ChainWithHooks(hooks))
+		chain := llm.NewChain(provider, prompt)
 
-		out, err := chains.Run(ctx, chain, "socks")
+		out, err := llm.ChainRun(ctx, chain, "socks")
 		if err != nil {
 			return err
 		}
@@ -59,20 +53,20 @@ func run(ctx context.Context, env llm.Env, args []string, w io.Writer) error {
 	}
 
 	{ // Second example
-		translatePrompt := gotemplate.New(
+		translatePrompt := llm.GoTemplate(
 			"Translate the following text from {{.inputLanguage}} to {{.outputLanguage}}. {{.text}}",
 			[]string{"inputLanguage", "outputLanguage", "text"},
 		)
 
-		chain := chains.New(provider, translatePrompt, llm.ChainWithHooks(hooks))
+		chain := llm.NewChain(provider, translatePrompt)
 
 		fmt.Fprintf(w, "\n-------\n\n")
 
 		// Otherwise the call function must be used.
-		outputValues, err := chains.Call(ctx, chain, map[string]any{
+		outputValues, err := llm.ChainCall(ctx, chain, map[string]any{
 			"inputLanguage":  "English",
 			"outputLanguage": "German",
-			"text":           "I love programming.",
+			"text":           "I love programming computers.",
 		})
 		if err != nil {
 			return err
@@ -92,10 +86,9 @@ func run(ctx context.Context, env llm.Env, args []string, w io.Writer) error {
 }
 
 type input struct {
-	host           string
-	model          string
-	prompt         string
-	llmTemperature float64
+	host   string
+	model  string
+	prompt string
 }
 
 func parse(args []string, env llm.Env) (input, error) {
@@ -108,9 +101,7 @@ func parse(args []string, env llm.Env) (input, error) {
 	flags := flag.NewFlagSet(args[0], flag.ExitOnError)
 
 	flags.StringVar(&in.host, "ollama-host", env.String("OLLAMA_HOST", "localhost"), "Hostname where your Ollama server is running")
-	flags.StringVar(&in.model, "ollama-model", env.String("OLLAMA_MODEL", "smollm2:135m"), "Model to use by Ollama")
-
-	flags.Float64Var(&in.llmTemperature, "llm-temperature", 0.8, "LLM temperature to use")
+	flags.StringVar(&in.model, "ollama-model", env.String("OLLAMA_MODEL", "phi4"), "Model to use by Ollama")
 
 	if err := flags.Parse(args[1:]); err != nil {
 		return in, err
