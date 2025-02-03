@@ -9,7 +9,7 @@ Current conversation:
 Human: {{.input}}
 AI:`
 
-func New(provider llm.Provider, memory llm.Memory, opts ...llm.ChainOption) llm.Chain {
+func New(provider llm.Provider, opts ...llm.ChainOption) llm.Chain {
 	opt := &llm.ChainOptions{}
 
 	for _, o := range opts {

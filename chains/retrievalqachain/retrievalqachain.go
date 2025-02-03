@@ -52,8 +52,7 @@ func New(combineDocumentsChain llm.Chain, retriever llm.Retriever, options ...fu
 	return c
 }
 
-// Call gets relevant documents from the retriever and gives them to the combine
-// documents chain.
+// Call gets relevant documents from the retriever and gives them to the combine documents chain.
 func (c Chain) Call(ctx context.Context, values map[string]any, options ...llm.ChainOption) (map[string]any, error) {
 	query, ok := values[c.InputKey].(string)
 	if !ok {

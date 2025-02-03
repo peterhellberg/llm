@@ -86,7 +86,7 @@ func (c *chain) Call(ctx context.Context, values map[string]any, options ...Chai
 		return nil, err
 	}
 
-	finalOutput, err := c.parser.ParseWithPrompt(result, prompt)
+	finalOutput, err := c.parser.Parse(result)
 	if err != nil {
 		return nil, err
 	}
