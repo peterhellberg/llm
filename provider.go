@@ -12,14 +12,18 @@ type Provider interface {
 
 // Content is a convenience function for calling an LLM provider with a single string prompt.
 func Content(ctx context.Context, provider Provider, prompt string, options ...ContentOption) (*ContentResponse, error) {
-	return provider.GenerateContent(ctx, []Message{
+	messages := []Message{
 		{
 			Role: ChatMessageTypeHuman,
 			Parts: []ContentPart{
-				TextContent{prompt},
+				TextContent{
+					Text: prompt,
+				},
 			},
 		},
-	}, options...)
+	}
+
+	return provider.GenerateContent(ctx, messages, options...)
 }
 
 // Call is a convenience function for calling an LLM provider with a single string prompt,
