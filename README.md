@@ -5,7 +5,7 @@
 This is a _very_ small subset of the [Langchain](https://github.com/langchain-ai/langchain) project in [Go](https://go.dev/).
 
 > [!Important]
-> It is quite heavily based on the more ambitious [LangChainGo](https://github.com/tmc/langchaingo)
+> It is quite heavily based on the more ambitious [LangChainGo](https://github.com/tmc/langchaingo), for now you should likely use that instead.
 
 ## Examples
 
