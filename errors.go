@@ -52,8 +52,8 @@ var (
 	ErrInputValuesWrongType = errors.New("input key is of wrong type")
 	// ErrExecutorInputNotString is returned if an input to the executor call function is not a string.
 	ErrExecutorInputNotString = errors.New("input to executor not string")
-	// ErrEmptyResponseFromProvider is returned when there was an empty response from the model.
-	ErrEmptyResponseFromProvider = fmt.Errorf("empty response from model")
+	// ErrEmptyResponseFromProvider is returned when there was an empty response from the provider.
+	ErrEmptyResponseFromProvider = fmt.Errorf("empty response from provider")
 	// ErrChainInitialization is returned if a chain is not initialized appropriately.
 	ErrChainInitialization = errors.New("error initializing chain")
 	// ErrAgentNoReturn is returned if the agent returns no actions and no finish.
