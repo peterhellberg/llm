@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/peterhellberg/llm"
+	"github.com/peterhellberg/llm/chains"
 	"github.com/peterhellberg/llm/memory"
 )
 
@@ -66,7 +67,7 @@ func (c Chain) Call(
 
 	inputValues[c.DocumentVariableName] = c.joinDocuments(docs)
 
-	return llm.ChainCall(ctx, c.Next, inputValues, options...)
+	return chains.Call(ctx, c.Next, inputValues, options...)
 }
 
 // GetMemory returns empty memory.

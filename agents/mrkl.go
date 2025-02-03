@@ -80,7 +80,7 @@ func (a *OneShotZeroAgent) Plan(
 		}
 	}
 
-	output, err := llm.ChainPredict(
+	output, err := chains.Predict(
 		ctx,
 		a.Chain,
 		fullInputs,

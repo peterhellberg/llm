@@ -2,10 +2,11 @@ package agents
 
 import (
 	"context"
-	_ "embed"
 	"fmt"
 	"regexp"
 	"strings"
+
+	_ "embed"
 
 	"github.com/peterhellberg/llm"
 	"github.com/peterhellberg/llm/chains"
@@ -79,7 +80,7 @@ func (a *ConversationalAgent) Plan(
 		}
 	}
 
-	output, err := llm.ChainPredict(
+	output, err := chains.Predict(
 		ctx,
 		a.Chain,
 		fullInputs,

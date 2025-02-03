@@ -49,7 +49,7 @@ func run(ctx context.Context, env llm.Env, args []string, w io.Writer) error {
 
 	chain := chains.New(provider, prompt, llm.ChainWithHooks(hooks))
 
-	out, err := llm.ChainRun(ctx, chain, "socks")
+	out, err := chains.Run(ctx, chain, "socks")
 	if err != nil {
 		return err
 	}
@@ -61,12 +61,12 @@ func run(ctx context.Context, env llm.Env, args []string, w io.Writer) error {
 		[]string{"inputLanguage", "outputLanguage", "text"},
 	)
 
-	chain = chains.New(provider, translatePrompt, chains.WithHooks(hooks))
+	chain = chains.New(provider, translatePrompt, llm.ChainWithHooks(hooks))
 
 	fmt.Fprintf(w, "\n-------\n\n")
 
 	// Otherwise the call function must be used.
-	outputValues, err := llm.ChainCall(ctx, chain, map[string]any{
+	outputValues, err := chains.Call(ctx, chain, map[string]any{
 		"inputLanguage":  "English",
 		"outputLanguage": "German",
 		"text":           "I love programming.",

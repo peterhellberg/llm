@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/peterhellberg/llm"
+	"github.com/peterhellberg/llm/chains"
 	"github.com/peterhellberg/llm/memory"
 )
 
@@ -61,7 +62,7 @@ func (c Chain) Call(ctx context.Context, values map[string]any, options ...llm.C
 		return nil, err
 	}
 
-	result, err := llm.ChainCall(ctx, c.CombineDocumentsChain, map[string]any{
+	result, err := chains.Call(ctx, c.CombineDocumentsChain, map[string]any{
 		"question":        query,
 		"input_documents": docs,
 	}, options...)

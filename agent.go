@@ -1,8 +1,6 @@
 package llm
 
-import (
-	"context"
-)
+import "context"
 
 // Agent is the interface all agents must implement.
 type Agent interface {
