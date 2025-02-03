@@ -13,7 +13,7 @@ type VectorStoreOption func(*VectorStoreOptions)
 
 // VectorStoreOptions is a set of options for similarity search and add documents.
 type VectorStoreOptions struct {
-	NameSpace      string
+	Namespace      string
 	ScoreThreshold float32
 	Filters        any
 	Embedder       Embedder
@@ -21,9 +21,9 @@ type VectorStoreOptions struct {
 }
 
 // VectorStoreWithNameSpace returns a VectorStoreOption for setting the name space.
-func VectorStoreWithNameSpace(nameSpace string) VectorStoreOption {
+func VectorStoreWithNameSpace(namespace string) VectorStoreOption {
 	return func(o *VectorStoreOptions) {
-		o.NameSpace = nameSpace
+		o.Namespace = namespace
 	}
 }
 
