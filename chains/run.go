@@ -8,9 +8,11 @@ import (
 
 // Run can be used to execute a chain if the chain only expects one input and one string output.
 func Run(ctx context.Context, c llm.Chain, input any, options ...llm.ChainOption) (string, error) {
-	inputKeys := c.GetInputKeys()
-	memoryKeys := c.GetMemory().MemoryVariables(ctx)
-	neededKeys := make([]string, 0, len(inputKeys))
+	var (
+		inputKeys  = c.GetInputKeys()
+		memoryKeys = c.GetMemory().MemoryVariables(ctx)
+		neededKeys = make([]string, 0, len(inputKeys))
+	)
 
 	// Remove keys gotten from the memory.
 	for _, inputKey := range inputKeys {
@@ -39,7 +41,9 @@ func Run(ctx context.Context, c llm.Chain, input any, options ...llm.ChainOption
 		return "", llm.ErrMultipleOutputsInRun
 	}
 
-	inputValues := map[string]any{neededKeys[0]: input}
+	inputValues := map[string]any{
+		neededKeys[0]: input,
+	}
 
 	outputValues, err := Call(ctx, c, inputValues, options...)
 	if err != nil {

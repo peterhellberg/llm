@@ -11,12 +11,14 @@ const defaultApplyMaxNumberWorkers = 5
 
 // Apply executes the chain for each of the inputs asynchronously.
 func Apply(ctx context.Context, c llm.Chain, inputValues []map[string]any, maxWorkers int, options ...llm.ChainOption) ([]map[string]any, error) {
+	var (
+		inputJobs   = make(chan applyInputJob, len(inputValues))
+		resultsChan = make(chan applyResult, len(inputValues))
+	)
+
 	if maxWorkers <= 0 {
 		maxWorkers = defaultApplyMaxNumberWorkers
 	}
-
-	inputJobs := make(chan applyInputJob, len(inputValues))
-	resultsChan := make(chan applyResult, len(inputValues))
 
 	var wg sync.WaitGroup
 	wg.Add(maxWorkers)
