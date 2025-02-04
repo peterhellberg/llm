@@ -64,22 +64,22 @@ func (m *Buffer) LoadVariables(ctx context.Context, _ map[string]any) (map[strin
 // input key must be a key in the input values and the output key must be a key in the output
 // values. The values in the input and output values used to save a user and AI message must
 // be strings.
-func (m *Buffer) SaveContext(ctx context.Context, inputValues map[string]any, outputValues map[string]any) error {
-	userInputValue, err := GetInputValue(inputValues, m.inputKey)
+func (m *Buffer) SaveContext(ctx context.Context, in map[string]any, out map[string]any) error {
+	userMessage, err := valuesString(in, m.inputKey)
 	if err != nil {
 		return err
 	}
 
-	if err := m.chatHistory.AddUserMessage(ctx, userInputValue); err != nil {
+	if err := m.chatHistory.AddUserMessage(ctx, userMessage); err != nil {
 		return err
 	}
 
-	aiOutputValue, err := GetInputValue(outputValues, m.outputKey)
+	aiMessage, err := valuesString(out, m.outputKey)
 	if err != nil {
 		return err
 	}
 
-	return m.chatHistory.AddAIMessage(ctx, aiOutputValue)
+	return m.chatHistory.AddAIMessage(ctx, aiMessage)
 }
 
 // Clear sets the chat messages to a new and empty chat message history.
@@ -91,46 +91,46 @@ func (m *Buffer) MemoryKey(context.Context) string {
 	return m.memoryKey
 }
 
-func GetInputValue(inputValues map[string]any, inputKey string) (string, error) {
-	// If the input key is set, return the value in the inputValues with the input key.
-	if inputKey != "" {
-		inputValue, ok := inputValues[inputKey]
+func valuesString(values map[string]any, key string) (string, error) {
+	// If the  key is set, return the value in the inputValues with the input key.
+	if key != "" {
+		v, ok := values[key]
 		if !ok {
 			return "", fmt.Errorf(
-				"%w: %v do not contain inputKey %s",
-				llm.ErrInvalidInputValues,
-				inputValues,
-				inputKey,
+				"%w: %v do not contain key %s",
+				llm.ErrInvalidValues,
+				values,
+				key,
 			)
 		}
 
-		return getInputValueReturnToString(inputValue)
+		return getValueReturnToString(v)
 	}
 
 	// Otherwise error if length of map isn't one, or return the only entry in the map.
-	if len(inputValues) > 1 {
+	if len(values) > 1 {
 		return "", fmt.Errorf(
-			"%w: multiple keys and no input key set",
-			llm.ErrInvalidInputValues,
+			"%w: multiple keys and no key set",
+			llm.ErrInvalidValues,
 		)
 	}
 
-	for _, inputValue := range inputValues {
-		return getInputValueReturnToString(inputValue)
+	for _, v := range values {
+		return getValueReturnToString(v)
 	}
 
 	return "", fmt.Errorf("%w: 0 keys", llm.ErrInvalidInputValues)
 }
 
-func getInputValueReturnToString(inputValue any) (string, error) {
-	switch value := inputValue.(type) {
+func getValueReturnToString(v any) (string, error) {
+	switch value := v.(type) {
 	case string:
 		return value, nil
 	default:
 		return "", fmt.Errorf(
-			"%w: input value %v not string",
+			"%w: value %v not string",
 			llm.ErrInvalidInputValues,
-			inputValue,
+			v,
 		)
 	}
 }

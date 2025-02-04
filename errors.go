@@ -44,6 +44,8 @@ var (
 	ErrInvalidOptions = errors.New("invalid options")
 	// ErrInvalidInputValues is returned if the input values to a chain is invalid.
 	ErrInvalidInputValues = errors.New("invalid input values")
+	// ErrInvalidValues is returned if the input values to a chain is invalid.
+	ErrInvalidValues = errors.New("invalid values")
 	// ErrInvalidChainReturnType is returned if the internal chain of the agent returns a value in the "text" filed that is not a string.
 	ErrInvalidChainReturnType = errors.New("agent chain did not return a string")
 	// ErrInputVariableReserved is returned when there is a conflict with a reserved variable name.
