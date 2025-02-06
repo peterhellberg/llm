@@ -8,8 +8,6 @@ import (
 var (
 	// ErrWrongOutputTypeInRun is returned in the run function if the chain returns a value that is not a string.
 	ErrWrongOutputTypeInRun = errors.New("run not supported in chain that returns value that is not string")
-	// ErrUnknownAgentType is returned if the type given to the initializer is invalid.
-	ErrUnknownAgentType = errors.New("unknown agent type")
 	// ErrUnexpectedChatMessageType is returned when a chat message is of an unexpected type.
 	ErrUnexpectedChatMessageType = errors.New("unexpected chat message type")
 	// ErrUnableToParseOutput is returned if the output of the llm is unparsable.
@@ -34,8 +32,6 @@ var (
 	ErrMismatchMetadatasAndText = errors.New("number of texts and metadatas does not match")
 	// ErrMemoryValuesWrongType is returned if the memory value to a chain is of wrong type.
 	ErrMemoryValuesWrongType = errors.New("memory key is of wrong type")
-	// ErrInvalidTemplateFormat is the error when the template format is invalid and not supported.
-	ErrInvalidTemplateFormat = errors.New("invalid template format")
 	// ErrInvalidPartialVariableType is returned when the partial variable is not a string or a function.
 	ErrInvalidPartialVariableType = errors.New("invalid partial variable type")
 	// ErrInvalidOutputValues is returned when expected output keys to a chain does not match the actual keys in the return output values map.
@@ -44,12 +40,8 @@ var (
 	ErrInvalidOptions = errors.New("invalid options")
 	// ErrInvalidInputValues is returned if the input values to a chain is invalid.
 	ErrInvalidInputValues = errors.New("invalid input values")
-	// ErrInvalidChainReturnType is returned if the internal chain of the agent returns a value in the "text" filed that is not a string.
-	ErrInvalidChainReturnType = errors.New("agent chain did not return a string")
 	// ErrInvalidValues is returned if the input values to a chain is invalid.
 	ErrInvalidValues = errors.New("invalid values")
-	// ErrInputVariableReserved is returned when there is a conflict with a reserved variable name.
-	ErrInputVariableReserved = errors.New("conflict with reserved variable name")
 	// ErrInputValuesWrongType is returned if an input value to a chain is of wrong type.
 	ErrInputValuesWrongType = errors.New("input key is of wrong type")
 	// ErrExecutorInputNotString is returned if an input to the executor call function is not a string.
