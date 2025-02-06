@@ -8,7 +8,7 @@ var (
 	_ llm.PromptFormatter  = Template{}
 )
 
-// ChatPromptTemplate is a prompt template for chat messages.
+// Template is a prompt template for chat messages.
 type Template struct {
 	// Messages is the list of the messages to be formatted.
 	Messages []llm.MessageFormatter
@@ -40,7 +40,7 @@ func (p Template) FormatPrompt(values map[string]any) (llm.Prompt, error) {
 	return Value(formattedMessages), nil
 }
 
-// Format formats the messages with values given and returns the messages as a string.
+// FormatString formats the messages with values given and returns the messages as a string.
 func (p Template) FormatString(values map[string]any) (string, error) {
 	promptValue, err := p.FormatPrompt(values)
 
@@ -77,7 +77,7 @@ func (p Template) InputVariables() []string {
 	return inputVariables
 }
 
-// NewChatPromptTemplate creates a new chat prompt template from a list of message formatters.
+// NewTemplate creates a new chat prompt template from a list of message formatters.
 func NewTemplate(messages []llm.MessageFormatter) Template {
 	return Template{
 		Messages: messages,
