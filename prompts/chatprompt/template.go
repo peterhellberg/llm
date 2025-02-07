@@ -26,36 +26,36 @@ func (p Template) FormatPrompt(values map[string]any) (llm.Prompt, error) {
 		return nil, err
 	}
 
-	formattedMessages := make([]llm.ChatMessage, 0, len(p.Messages))
+	chatMessages := make([]llm.ChatMessage, 0, len(p.Messages))
 
 	for _, m := range p.Messages {
-		curFormattedMessages, err := m.FormatMessages(resolvedValues)
+		formattedMessages, err := m.FormatMessages(resolvedValues)
 		if err != nil {
 			return nil, err
 		}
 
-		formattedMessages = append(formattedMessages, curFormattedMessages...)
+		chatMessages = append(chatMessages, formattedMessages...)
 	}
 
-	return Value(formattedMessages), nil
+	return Value(chatMessages), nil
 }
 
 // FormatString formats the messages with values given and returns the messages as a string.
 func (p Template) FormatString(values map[string]any) (string, error) {
-	promptValue, err := p.FormatPrompt(values)
+	prompt, err := p.FormatPrompt(values)
 
-	return promptValue.String(), err
+	return prompt.String(), err
 }
 
 // FormatMessages formats the messages with the values and returns the formatted messages.
 func (p Template) FormatMessages(values map[string]any) ([]llm.ChatMessage, error) {
-	promptValue, err := p.FormatPrompt(values)
+	prompt, err := p.FormatPrompt(values)
 
-	if promptValue == nil {
+	if prompt == nil {
 		return nil, err
 	}
 
-	return promptValue.Messages(), err
+	return prompt.Messages(), err
 }
 
 // InputVariables returns the input variables the prompt expect.

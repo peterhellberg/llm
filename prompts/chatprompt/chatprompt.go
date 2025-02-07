@@ -14,11 +14,11 @@ type Value []llm.ChatMessage
 // String returns the chat message slice as a buffer string.
 func (v Value) String() string {
 	s, err := llm.BufferString(v, "Human", "AI")
-	if err == nil {
-		return s
+	if err != nil {
+		return fmt.Sprintf("%v", []llm.ChatMessage(v))
 	}
 
-	return fmt.Sprintf("%v", []llm.ChatMessage(v))
+	return s
 }
 
 // Messages returns the ChatMessage slice.
