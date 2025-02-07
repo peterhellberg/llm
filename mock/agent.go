@@ -9,14 +9,14 @@ import (
 var _ llm.Agent = Agent{}
 
 type Agent struct {
-	AgentToolsFunc func() []llm.AgentTool
+	ToolsFunc      func() []llm.AgentTool
 	InputKeysFunc  func() []string
 	OutputKeysFunc func() []string
 	PlanFunc       func(context.Context, []llm.AgentStep, map[string]string) ([]llm.AgentAction, *llm.AgentFinish, error)
 }
 
-func (a Agent) AgentTools() []llm.AgentTool {
-	return a.AgentToolsFunc()
+func (a Agent) Tools() []llm.AgentTool {
+	return a.ToolsFunc()
 }
 
 func (a Agent) InputKeys() []string {

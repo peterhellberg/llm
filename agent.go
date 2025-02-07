@@ -8,7 +8,7 @@ type Agent interface {
 	Plan(ctx context.Context, steps []AgentStep, inputs map[string]string) ([]AgentAction, *AgentFinish, error)
 	InputKeys() []string
 	OutputKeys() []string
-	AgentTools() []AgentTool
+	Tools() []AgentTool
 }
 
 // AgentAction is the agent's action to take.
