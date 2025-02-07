@@ -3,7 +3,7 @@ package agents
 import "github.com/peterhellberg/llm"
 
 type Options struct {
-	prompt                  llm.Template
+	template                llm.Template
 	memory                  llm.Memory
 	hooks                   llm.Hooks
 	errorHandler            *llm.ParserErrorHandler
@@ -53,10 +53,10 @@ func WithPromptSuffix(suffix string) Option {
 	}
 }
 
-// WithPrompt is an option for setting the prompt the agent will use.
-func WithPrompt(prompt llm.Template) Option {
+// WithTemplate is an option for setting the prompt template the agent will use.
+func WithTemplate(template llm.Template) Option {
 	return func(co *Options) {
-		co.prompt = prompt
+		co.template = template
 	}
 }
 
