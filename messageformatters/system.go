@@ -5,9 +5,9 @@ import "github.com/peterhellberg/llm"
 var _ llm.MessageFormatter = System{}
 
 // NewSystem creates a new system message prompt formatter.
-func NewSystem(template string, inputVariables []string) System {
+func NewSystem(content string, inputVariables []string) System {
 	return System{
-		Template: llm.GoTemplate(template, inputVariables),
+		Template: llm.GoTemplate(content, inputVariables),
 	}
 }
 

@@ -7,15 +7,15 @@ var _ llm.MessageFormatter = Generic{}
 // NewGeneric creates a new generic message prompt formatter.
 func NewGeneric(role, content string, variables []string) Generic {
 	return Generic{
-		Template: llm.GoTemplate(content, variables),
 		Role:     role,
+		Template: llm.GoTemplate(content, variables),
 	}
 }
 
 // Generic is a message formatter that returns message with the specified speaker.
 type Generic struct {
-	Template llm.Template
 	Role     string
+	Template llm.Template
 }
 
 // FormatMessages formats the message with the values given.
