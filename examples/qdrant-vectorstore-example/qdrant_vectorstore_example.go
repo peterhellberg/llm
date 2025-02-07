@@ -23,7 +23,7 @@ func main() {
 func run(ctx context.Context, env llm.Env) error {
 	embedderClient, err := ollama.New(
 		ollama.WithHost(env.String("OLLAMA_HOST", "")),
-		ollama.WithModel(env.String("OLLAMA_MODEL", "snowflake-arctic-embed:22m")),
+		ollama.WithModel(env.String("OLLAMA_EMBEDDING_MODEL", "snowflake-arctic-embed:22m")),
 	)
 	if err != nil {
 		return err
@@ -37,7 +37,7 @@ func run(ctx context.Context, env llm.Env) error {
 	// Create a new Qdrant vector store.
 	store, err := qdrantstore.New(
 		qdrantstore.WithRawURL(env.String("QDRANT_URL", "http://localhost:6333")),
-		qdrantstore.WithAPIKey(env.String("QDRANT_API_KEY", "")),
+		qdrantstore.WithAPIKey(env.String("QDRANT__SERVICE__API_KEY", "")),
 		qdrantstore.WithCollectionName(env.String("QDRANT_COLLECTION_NAME", "example")),
 		qdrantstore.WithCollectionVectorSize(env.Int("QDRANT_COLLECTION_VECTOR_SIZE", 384)),
 		qdrantstore.WithEmbedder(embedder),
