@@ -8,7 +8,10 @@ import (
 	"github.com/peterhellberg/llm/providers/ollama/internal/ollama"
 )
 
-var _ llm.Provider = (*Provider)(nil)
+var (
+	_ llm.Provider       = (*Provider)(nil)
+	_ llm.EmbedderClient = (*Provider)(nil)
+)
 
 var (
 	ErrEmptyResponse                    = fmt.Errorf("no response")
