@@ -1,12 +1,12 @@
 package fstring
 
-import "errors"
+import "fmt"
 
 var (
-	ErrEmptyExpression       = errors.New("empty expression not allowed")
-	ErrArgsNotDefined        = errors.New("args not defined")
-	ErrLeftBracketNotClosed  = errors.New("single '{' is not allowed")
-	ErrRightBracketNotClosed = errors.New("single '}' is not allowed")
+	ErrEmptyExpression       = fmt.Errorf("empty expression not allowed")
+	ErrArgsNotDefined        = fmt.Errorf("args not defined")
+	ErrLeftBracketNotClosed  = fmt.Errorf("single '{' is not allowed")
+	ErrRightBracketNotClosed = fmt.Errorf("single '}' is not allowed")
 )
 
 // Format interpolates the given template with the given values by using f-string.
