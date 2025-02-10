@@ -10,8 +10,10 @@ type Document struct {
 
 // SplitDocuments splits documents using a textsplitter.
 func SplitDocuments(textSplitter TextSplitter, documents []Document) ([]Document, error) {
-	texts := make([]string, 0)
-	metadatas := make([]map[string]any, 0)
+	var (
+		texts     = make([]string, 0)
+		metadatas = make([]map[string]any, 0)
+	)
 
 	for _, document := range documents {
 		texts = append(texts, document.PageContent)
