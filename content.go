@@ -10,6 +10,20 @@ func TextPart(s string) TextContent {
 	return TextContent{Text: s}
 }
 
+// TextParts is a helper function to create a Message with a role and a list of text parts.
+func TextParts(role ChatMessageType, parts ...string) Message {
+	result := Message{
+		Role:  role,
+		Parts: []ContentPart{},
+	}
+
+	for _, part := range parts {
+		result.Parts = append(result.Parts, TextPart(part))
+	}
+
+	return result
+}
+
 // BinaryPart creates a new BinaryContent from the given MIME type (e.g.
 // "image/png" and binary data).
 func BinaryPart(mime string, data []byte) BinaryContent {
@@ -202,6 +216,8 @@ type FunctionDefinition struct {
 	Description string `json:"description"`
 	// Parameters is a list of parameters for the function.
 	Parameters any `json:"parameters,omitempty"`
+	// Strict is a flag to indicate if the function should be called strictly. Only used for openai llm structured output.
+	Strict bool `json:"strict,omitempty"`
 }
 
 // ToolChoice is a specific tool to use.
