@@ -22,6 +22,7 @@ type Env interface {
 	Float64(key string, fallback float64) float64
 	Int(key string, fallback int) int
 	String(key, fallback string) string
+	Get(key string) string
 }
 
 type env struct {
@@ -67,4 +68,9 @@ func (e *env) Int(key string, fallback int) int {
 // String returns a string from the env, or fallback variable
 func (e *env) String(key, fallback string) string {
 	return cmp.Or(e.getenv(key), fallback)
+}
+
+// Get environment variable value
+func (e *env) Get(key string) string {
+	return e.getenv(key)
 }
