@@ -1,5 +1,6 @@
-A very small subset of the langchain project in Go.
-Copyright © 2025 Peter Hellberg
+MIT License
+
+Copyright (c) 2025 Peter Hellberg
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the "Software"),
